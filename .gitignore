@@ -20,6 +20,22 @@
 *.mod
 *.smod
 
+# Debug files
+*.dSYM/
+*.su
+*.log
+
+# Build directory and files
+*.depend
+*.layout
+.vscode/ipch/
+build/
+bin/
+lib/
+obj/
+Debug/
+Release/
+
 # Compiled Static libraries
 *.lai
 *.la
