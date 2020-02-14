@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
-set( CMAKE_C_COMPILER  ${COMPILER_PATH}${CROSS_COMPILE}clang )
-set( CMAKE_CXX_COMPILER  ${COMPILER_PATH}${CROSS_COMPILE}clang++ )
-set( CMAKE_AR  llvm-ar )
-set( CMAKE_RANLIB  llvm-ranlib )
+
+#set( CMAKE_C_COMPILER  ${COMPILER_PATH}${CROSS_COMPILE}clang )
+#set( CMAKE_CXX_COMPILER  ${COMPILER_PATH}${CROSS_COMPILE}clang++ )
+#set( CMAKE_AR  llvm-ar )
+#set( CMAKE_RANLIB  llvm-ranlib )
 
 enable_language(CXX)
 enable_language(C)
@@ -32,5 +33,7 @@ add_library ( rt STATIC ${builtins_sources} )
 
 target_include_directories( rt PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}"
                                       "${CMAKE_CURRENT_SOURCE_DIR}/../include" )
+install(TARGETS rt
+	ARCHIVE DESTINATION ewasm/lib)
 
 #add_custom_command( TARGET rt POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:rt> ${BASE_BINARY_DIR}/lib )
