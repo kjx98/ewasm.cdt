@@ -57,6 +57,10 @@ typedef unsigned __int128 u128; // a 128 bit number, represented as a 16 bytes l
 typedef uint32_t i32ptr; // same as i32 in WebAssembly, but treated as a pointer to a WebAssembly memory offset
 // ethereum interface functions
 
+// builtin and host interface function as C declarations
+#ifdef	__cplusplus
+extern "C" {            /* Assume C declarations for C++ */
+#endif
 // define for memory op, no string.h with clang wasm32 target
 void *memcpy(void *dts, const void *src, size_t);
 void *memmove(void *dts, const void *src, size_t);
@@ -65,7 +69,6 @@ int	memcmp(const void *, const void *, size_t);
 void *malloc(size_t);
 void free(void *);
 void *realloc(void *, size_t);
-
 
 
 ////////////////////////////
@@ -111,14 +114,13 @@ extern int __builtin_ctz(unsigned int); 		// wasm i32.ctz opcode
 extern int __builtin_ctzll(unsigned long long); 	// wasm i64.ctz opcode
 // there are many more like this
 
+void inline exit(int i){ __builtin_unreachable(); }
+
 
 // follow should move to internal of memory.c
 ////////////////////////////
 // Memory Managment Stuff //
 ////////////////////////////
-
-#define PAGE_SIZE 65536
-#define GROWABLE_MEMORY true	// whether we want memory to be growable; true/false
 
 extern unsigned char __heap_base;	// heap_base is immutable position where their model of heap grows down from, can ignore
 extern unsigned char __data_end;	// data_end is immutable position in memory up to where statically allocated things are
@@ -129,6 +131,9 @@ extern unsigned long __builtin_wasm_memory_size(int);	// arg must be zero until 
 //  unsigned char* heap_base = &__heap_base;
 //  unsigned char* data_end = &__data_end;
 //  unsigned int memory_size = __builtin_wasm_memory_size(0);
+#ifdef	__cplusplus
+}
+#endif
 
 
 ///////////
@@ -153,7 +158,6 @@ e.g. create a global variable (but it will be immutable, don't know how to creat
 
 */
 
-void inline exit(int i){ __builtin_unreachable(); }
 
 //
 // for testing, can export start fuction

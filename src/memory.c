@@ -1,5 +1,7 @@
-#include <stdint.h>
 #include "ewasm.h"
+
+#define PAGE_SIZE 65536
+#define GROWABLE_MEMORY true	// whether we want memory to be growable; true/false
 
 #ifdef	not_work
 void* malloc(const size_t size){
@@ -86,8 +88,8 @@ int memcmp ( const void * in1, const void * in2, size_t num ){
   int ret=0;
   for (int i=0;i<num;++i){
     if (in1_ptr[i]!=in2_ptr[i]){
-		ret = (in1_ptr[i] - in2_ptr[i]);
-      break;
+		ret = (in1_ptr[i] > in2_ptr[i])?1:-1;
+		break;
     }
   }
   return ret;

@@ -9,5 +9,9 @@ project(cdt)
 
 install(DIRECTORY include 
 		DESTINATION ewasm)
+install(FILES ewasm.syms
+		DESTINATION ewasm)
+install(PROGRAMS bldewasm.sh
+		DESTINATION $ENV{HOME}/bin)
 
 add_subdirectory( src )
