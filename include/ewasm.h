@@ -16,8 +16,8 @@
     You should have received a copy of the GNU General Public License
     along with ewasm.cdt.  If not, see <https://www.gnu.org/licenses/>.
 */
-
 #pragma once
+
 #ifndef __EWASM_H__
 #define __EWASM_H__
 
@@ -47,9 +47,17 @@ typedef int64_t i64; // same as i64 in WebAssembly
 // Types for Ethereum Stuff //
 //////////////////////////////
 
-typedef uint8_t* bytes; // an array of bytes with unrestricted length
+//typedef uint8_t* bytes; // an array of bytes with unrestricted length
 typedef uint8_t bytes32[32]; // an array of 32 bytes
-typedef uint8_t address[20]; // an array of 20 bytes
+typedef struct	eth_bytes32
+{
+	uint8_t	bytes[32];
+} eth_bytes32;
+typedef struct eth_bytes32	eth_uint256be;
+typedef struct	eth_address
+{
+	uint8_t bytes[20]; // an array of 20 bytes
+} eth_address;
 typedef uint32_t u32;
 typedef uint64_t u64;
 typedef unsigned __int128 u128; // a 128 bit number, represented as a 16 bytes long little endian unsigned integer in memory, not sure if this works
@@ -70,6 +78,15 @@ void *malloc(size_t);
 void free(void *);
 void *realloc(void *, size_t);
 
+// bswap32, bswap64 already builtin
+inline uint128_t bswap128(uint128_t ml) {
+	uint128_t ret;
+	u64	*ss=(u64 *)&ml;
+	u64	*dp=(u64 *)&ret;
+	dp[0] = __builtin_bswap64(ss[1]);
+	dp[1] = __builtin_bswap64(ss[0]);
+	return ret;
+}
 
 ////////////////////////////
 // EEI Method Declaration //
@@ -78,18 +95,18 @@ void *realloc(void *, size_t);
     __attribute__((import_module("ethereum"),import_name( #name )))
 
 void DECL_IMPORT(useGas, (i64 gas));
-void DECL_IMPORT(getAddress, (address res));
-void DECL_IMPORT(getExternalBalance, (address acct, u128 *bal));
+void DECL_IMPORT(getAddress, (eth_address* res));
+void DECL_IMPORT(getExternalBalance, (eth_address* acct, u128 *bal));
 void DECL_IMPORT(storageStore, (bytes32 key, bytes32 value));
 void DECL_IMPORT(storageLoad, (bytes32 key, bytes32 value));
-void DECL_IMPORT(getCaller, (address acct));
+void DECL_IMPORT(getCaller, (eth_address* acct));
 void DECL_IMPORT(getCallValue, (u128 *val));
-void DECL_IMPORT(getTxOrigin, (address acct));
+void DECL_IMPORT(getTxOrigin, (eth_address* acct));
 
 u32	DECL_IMPORT(getCallDataSize, () );
 void DECL_IMPORT(callDataCopy, (void *res, u32 dOff, u32 dLen));
 
-void DECL_IMPORT(codeCopy, (bytes res, u32 codeOff, u32 codeLen));
+void DECL_IMPORT(codeCopy, (void *res, u32 codeOff, u32 codeLen));
 u32 DECL_IMPORT(getCodeSize, () );
 
 u64 DECL_IMPORT(getGasLeft, () );
@@ -98,11 +115,11 @@ void DECL_IMPORT(getTxGasPrice, (u128 *prc));
 u64 DECL_IMPORT(getBlockNumber, () );
 u64 DECL_IMPORT(getBlockTimestamp, () );
 
-void DECL_IMPORT(log, (bytes dat, u32 dLen, u32 numTopics, bytes32 to1, bytes32 to2, bytes32 to3, bytes32 to4));
+void DECL_IMPORT(log, (void* dat, u32 dLen, u32 numTopics, bytes32 to1, bytes32 to2, bytes32 to3, bytes32 to4));
 
-void DECL_IMPORT(finish, (bytes _off, u32 _len));
-void DECL_IMPORT(revert, (bytes _off, u32 _len));
-void DECL_IMPORT(selfDestruct, (address selfAddr));
+void DECL_IMPORT(finish, (void* _off, u32 _len));
+void DECL_IMPORT(revert, (void* _off, u32 _len));
+void DECL_IMPORT(selfDestruct, (eth_address* selfAddr));
 
 
 ///////////////////////////////////////////////////
@@ -115,7 +132,6 @@ extern int __builtin_ctzll(unsigned long long); 	// wasm i64.ctz opcode
 // there are many more like this
 
 void inline exit(int i){ __builtin_unreachable(); }
-
 
 // follow should move to internal of memory.c
 ////////////////////////////
@@ -131,6 +147,58 @@ extern unsigned long __builtin_wasm_memory_size(int);	// arg must be zero until 
 //  unsigned char* heap_base = &__heap_base;
 //  unsigned char* data_end = &__data_end;
 //  unsigned int memory_size = __builtin_wasm_memory_size(0);
+#ifdef	__cplusplus
+}
+#endif
+
+// ethereum ABI
+#ifdef	__cplusplus
+class	bytes {
+public:
+	bytes() = default;
+	bytes(const bytes&) = default;
+	bytes(void *dp, size_t siz) : _data((uint8_t *)dp), _size(siz) {}
+	bool operator==(const bytes &bs) const noexcept {
+		if (_size != bs._size) return false;
+		return memcmp(_data, bs._data, _size) == 0;
+	}
+	const size_t size() const noexcept { return _size; }
+	uint8_t *data() const noexcept { return _data;}
+private:
+	uint8_t	*_data=nullptr;
+	uint32_t	_size=0;
+};
+
+using string = bytes;
+#endif
+enum	eth_argType {
+	UINT32 = 0,
+	UINT64 = 1,
+	UINT128= 2,
+	UINT256= 3,
+	INT32  = 4,
+	INT64  = 5,
+	INT128 = 6,
+	INT256 = 7,
+	UINT160= 8,
+	STRING = 9,
+	BYTES  = 10,
+};
+
+typedef struct eth_argument
+{
+	i32		_type;
+	void	*valPtr;
+}	eth_argument;
+
+// ethereum ABI
+#ifdef	__cplusplus
+extern "C" {            /* Assume C declarations for C++ */
+#endif
+extern u32 getCallMethodID();
+extern int decodeParam(eth_argument *, int);
+extern int encodeResult(eth_argument *, int);
+
 #ifdef	__cplusplus
 }
 #endif
