@@ -34,6 +34,11 @@ typedef __int128	int128_t;
 typedef uint8_t		byte;
 #endif
 
+#ifdef	__GNUC__
+#define forceinline __inline__ __attribute__((always_inline))
+#else
+#define forceinline __inline__
+#endif
 
 //////////////////////////
 // Types For Wasm Stuff //
@@ -74,12 +79,14 @@ void *memcpy(void *dts, const void *src, size_t);
 void *memmove(void *dts, const void *src, size_t);
 void *memset(void *s, int c, size_t);
 int	memcmp(const void *, const void *, size_t);
+size_t  strlen(const char *);
+
 void *malloc(size_t);
 void free(void *);
 void *realloc(void *, size_t);
 
 // bswap32, bswap64 already builtin
-inline uint128_t bswap128(uint128_t ml) {
+forceinline uint128_t bswap128(uint128_t ml) {
 	uint128_t ret;
 	u64	*ss=(u64 *)&ml;
 	u64	*dp=(u64 *)&ret;
@@ -131,7 +138,7 @@ extern int __builtin_ctz(unsigned int); 		// wasm i32.ctz opcode
 extern int __builtin_ctzll(unsigned long long); 	// wasm i64.ctz opcode
 // there are many more like this
 
-void inline exit(int i){ __builtin_unreachable(); }
+void forceinline exit(int i){ __builtin_unreachable(); }
 
 // follow should move to internal of memory.c
 ////////////////////////////
@@ -171,6 +178,7 @@ private:
 
 using string = bytes;
 #endif
+
 enum	eth_argType {
 	UINT32 = 0,
 	UINT64 = 1,
@@ -188,15 +196,33 @@ enum	eth_argType {
 typedef struct eth_argument
 {
 	i32		_type;
-	void	*valPtr;
+	void	*pValue;	// for int/uint 128, 256 and bytes
+	u64		_nValue;
 }	eth_argument;
+
+typedef struct eth_method
+{
+	char	*Name;	// name of method
+	uint32_t	Id;		// uint32be ID of method, 0 for Constructor
+	int		nParams;
+	int		nResults;
+	eth_argument	*inputs;
+	eth_argument	*outputs;
+}	eth_method;
+
+typedef struct eth_ABI
+{
+	int		nMethods;	// >0, at least constructor
+	eth_method	*methods;	// the first method MUST BE constructor
+}	eth_ABI;
 
 // ethereum ABI
 #ifdef	__cplusplus
 extern "C" {            /* Assume C declarations for C++ */
 #endif
-extern u32 getCallMethodID();
-extern int decodeParam(eth_argument *, int);
+//extern u32 getCallMethodID();
+//extern int decodeParam(eth_argument *, int);
+extern	eth_ABI	__Contract_ABI;
 extern int encodeResult(eth_argument *, int);
 
 #ifdef	__cplusplus

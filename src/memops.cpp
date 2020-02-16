@@ -1,4 +1,4 @@
-#include "ewasm.hpp"
+#include <ewasm/ewasm.hpp>
 
 // already builtin
 #ifdef	ommit

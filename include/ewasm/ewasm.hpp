@@ -21,7 +21,7 @@
 #ifndef __EWASM_HPP__
 #define __EWASM_HPP__
 
-#include "ewasm.h"
+#include <ewasm/ewasm.h>
 
 // EWASM C++ API - wrappers and bindings for C++
 // @ingroup cpp

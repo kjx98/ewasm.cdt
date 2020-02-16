@@ -1,10 +1,10 @@
 #include "compiler_builtins.hpp"
-#include <stdint.h>
+//#include <stdint.h>
+//#include <assert.h>
 
 //static constexpr uint32_t SHIFT_WIDTH = (sizeof(uint64_t)*8)-1;
 
 extern "C" {
-void assert(int32_t, const char*);
 void __ashlti3(__int128& ret, uint64_t low, uint64_t high, uint32_t shift) {
    uint128_t i = high;
    i <<= 64;

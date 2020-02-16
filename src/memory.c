@@ -1,4 +1,14 @@
-#include "ewasm.h"
+#include <stdarg.h>
+#include <stdbool.h>
+//#include <alloca.h>
+#include <assert.h>
+#include <byteswap.h>
+#include <endian.h>
+#include <limits.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdnoreturn.h>
+#include <ewasm/ewasm.h>
 
 #define PAGE_SIZE 65536
 #define GROWABLE_MEMORY true	// whether we want memory to be growable; true/false
