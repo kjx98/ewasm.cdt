@@ -93,6 +93,7 @@ int	memcmp(const void *, const void *, size_t);
 size_t  strlen(const char *);
 
 void *malloc(size_t);
+void *calloc(size_t count, size_t size);
 void free(void *);
 void *realloc(void *, size_t);
 

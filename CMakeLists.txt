@@ -17,3 +17,4 @@ install(PROGRAMS bldewasm.sh
 		DESTINATION $ENV{HOME}/bin)
 
 add_subdirectory( rt )
+add_subdirectory( libc )
