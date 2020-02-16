@@ -76,6 +76,15 @@ struct bytes32 : eth_bytes32
 	/// Initializes bytes to zeros if not other @p init value provided.
 	constexpr bytes32(eth_bytes32 init = {}) noexcept : eth_bytes32{init} {}
 
+	/// Converting constructor from address
+	///
+	/// This constructor assigns the @p v value to the last 8 bytes [24:31]
+	/// in big-endian order.
+	explicit bytes32(const address &addr) noexcept {
+		memset(bytes, 0, 12);
+		memcpy(bytes, addr.bytes, 20);
+	}
+
 	/// Converting constructor from unsigned integer value.
 	///
 	/// This constructor assigns the @p v value to the last 8 bytes [24:31]

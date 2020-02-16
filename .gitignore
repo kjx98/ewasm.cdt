@@ -45,4 +45,5 @@ Release/
 # Executables
 *.exe
 *.out
+*.wasm
 *.app

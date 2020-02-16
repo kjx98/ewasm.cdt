@@ -21,8 +21,19 @@
 #ifndef __EWASM_H__
 #define __EWASM_H__
 
+#if	__clang_major__ >= 8
 #include <stddef.h>
 #include <stdint.h>
+#else
+typedef	unsigned char	uint8_t;
+typedef	unsigned short	uint16_t;
+typedef	unsigned int	uint32_t;
+typedef	unsigned long long	uint64_t;
+typedef	unsigned long	size_t;
+typedef	short	int16_t;
+typedef	int	int32_t;
+typedef	long long	int64_t;
+#endif
 
 #ifdef	__cplusplus
 using uint128_t = unsigned __int128;
@@ -53,7 +64,7 @@ typedef int64_t i64; // same as i64 in WebAssembly
 //////////////////////////////
 
 //typedef uint8_t* bytes; // an array of bytes with unrestricted length
-typedef uint8_t bytes32[32]; // an array of 32 bytes
+//typedef uint8_t bytes32[32]; // an array of 32 bytes
 typedef struct	eth_bytes32
 {
 	uint8_t	bytes[32];
@@ -101,15 +112,33 @@ forceinline uint128_t bswap128(uint128_t ml) {
 #define DECL_IMPORT(name, args) eth_##name args \
     __attribute__((import_module("ethereum"),import_name( #name )))
 
-void DECL_IMPORT(useGas, (i64 gas));
-void DECL_IMPORT(getAddress, (eth_address* res));
-void DECL_IMPORT(getExternalBalance, (eth_address* acct, u128 *bal));
-void DECL_IMPORT(storageStore, (bytes32 key, bytes32 value));
-void DECL_IMPORT(storageLoad, (bytes32 key, bytes32 value));
-void DECL_IMPORT(getCaller, (eth_address* acct));
-void DECL_IMPORT(getCallValue, (u128 *val));
-void DECL_IMPORT(getTxOrigin, (eth_address* acct));
+#ifdef	__cplusplus
+namespace	ewasm {
+struct	address;
+struct	bytes32;
+};
+using	namespace ewasm;
+void DECL_IMPORT(getAddress, (address* res));
+void DECL_IMPORT(getExternalBalance, (address* acct, u128 *bal));
+void DECL_IMPORT(storageStore, (bytes32* key, bytes32* value));
+void DECL_IMPORT(storageLoad, (bytes32* key, bytes32* value));
+void DECL_IMPORT(getCaller, (address* acct));
+void DECL_IMPORT(getTxOrigin, (address* acct));
+void DECL_IMPORT(log, (void* dat, u32 dLen, u32 numTopics, bytes32* to1, bytes32* to2, bytes32* to3, bytes32* to4));
+void DECL_IMPORT(selfDestruct, (address* selfAddr));
+#else
+void DECL_IMPORT(getAddress, (void* res));
+void DECL_IMPORT(getExternalBalance, (void* acct, u128 *bal));
+void DECL_IMPORT(storageStore, (void* key, void* value));
+void DECL_IMPORT(storageLoad, (void* key, void* value));
+void DECL_IMPORT(getCaller, (void* acct));
+void DECL_IMPORT(getTxOrigin, (void* acct));
+void DECL_IMPORT(log, (void* dat, u32 dLen, u32 numTopics, void* to1, void* to2, void* to3, void* to4));
+void DECL_IMPORT(selfDestruct, (void* selfAddr));
+#endif
 
+void DECL_IMPORT(useGas, (i64 gas));
+void DECL_IMPORT(getCallValue, (u128 *val));
 u32	DECL_IMPORT(getCallDataSize, () );
 void DECL_IMPORT(callDataCopy, (void *res, u32 dOff, u32 dLen));
 
@@ -122,11 +151,8 @@ void DECL_IMPORT(getTxGasPrice, (u128 *prc));
 u64 DECL_IMPORT(getBlockNumber, () );
 u64 DECL_IMPORT(getBlockTimestamp, () );
 
-void DECL_IMPORT(log, (void* dat, u32 dLen, u32 numTopics, bytes32 to1, bytes32 to2, bytes32 to3, bytes32 to4));
-
 void DECL_IMPORT(finish, (void* _off, u32 _len));
 void DECL_IMPORT(revert, (void* _off, u32 _len));
-void DECL_IMPORT(selfDestruct, (eth_address* selfAddr));
 
 
 ///////////////////////////////////////////////////
@@ -203,7 +229,7 @@ typedef struct eth_argument
 typedef struct eth_method
 {
 	char	*Name;	// name of method
-	uint32_t	Id;		// uint32be ID of method, 0 for Constructor
+	u32		Id;		// uint32be ID of method, 0 for Constructor
 	int		nParams;
 	int		nResults;
 	eth_argument	*inputs;
@@ -212,7 +238,7 @@ typedef struct eth_method
 
 typedef struct eth_ABI
 {
-	int		nMethods;	// >0, at least constructor
+	uint32_t	nMethods;	// >0, at least constructor
 	eth_method	*methods;	// the first method MUST BE constructor
 }	eth_ABI;
 
@@ -223,7 +249,8 @@ extern "C" {            /* Assume C declarations for C++ */
 //extern u32 getCallMethodID();
 //extern int decodeParam(eth_argument *, int);
 extern	eth_ABI	__Contract_ABI;
-extern int encodeResult(eth_argument *, int);
+extern	void eth_main(const u32 Id, const byte*, const u32, const eth_method *);
+extern int encodeResult(eth_argument *, const int);
 
 #ifdef	__cplusplus
 }

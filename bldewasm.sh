@@ -5,11 +5,52 @@
 # llvm 8 may export __heap_base and __data_end
 #
 
-FILE=$1
+if [ -d ../include/ewasm ]; then
+	INCD=../include
+	LIBPATH=../build/src
+	OPTS=""
+else
+	INCD=${HOME}/opt/ewasm/include
+	LIBPATH=${HOME}/opt/ewasm/lib
+	OPTS="-O3"
+fi
 
-#clang -c -O3 -Wall -I${HOME}/opt/ewasm/include --target=wasm32 ${FILE}.c
-clang -c -Wall -I${HOME}/opt/ewasm/include --target=wasm32 ${FILE}.c
-wasm-ld --no-entry --allow-undefined-file=${HOME}/opt/ewasm/ewasm.syms --export=main --strip-all ${FILE}.o -L${HOME}/opt/ewasm/lib -lrt -o ${FILE}.wasm
-rm -f ${FILE}.o
+compile() {
+SFIL=$1
+SRC=""
+if [ -f ${SFIL}.cc ]; then
+	SRC=${SFIL}.cc
+elif [ -f ${SFIL}.cpp ]; then
+	SRC=${SFIL}.cpp
+fi
+if [ "${SRC}" != "" ]; then
+	echo "compile c++ ${SRC}"
+	clang++ -c ${OPTS} -Wall -I${INCD} --target=wasm32 ${SRC}
+else
+	echo "compile c ${SFIL}"
+	clang -c ${OPTS} -Wall -I${INCD} --target=wasm32 ${SFIL}.c
+fi
+}
+
+FILE=$1
+if [ "$FILE" = "" ]; then
+	echo "empty proj"
+	exit 0
+fi
+
+echo "build $# ${FILE} with opt ${OPTS}"
+compile $1
+OBJS=${FILE}.o
+if [ $# -gt 1 ]; then
+	compile $2
+	OBJS+=" $2.o"
+fi
+
+# moved to compile fuc
+#clang -c -O3 -Wall -I${INCD}/opt/ewasm/include --target=wasm32 ${FILE}.c
+#clang -c ${OPTS} -Wall -I${INCD} --target=wasm32 ${FILE}.c
+
+wasm-ld --no-entry --allow-undefined-file=${HOME}/opt/ewasm/ewasm.syms --export=main --strip-all ${OBJS} -L${LIBPATH} -lrt -o ${FILE}.wasm
+rm -f ${OBJS}
 #wasm-dis /tmp/${FILE}.wasm | sed -s 's/Main/main/' > /tmp/${FILE}.wat
 #wasm-as /tmp/${FILE}.wat -o ${FILE}.wasm
