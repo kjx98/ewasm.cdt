@@ -28,18 +28,18 @@
 namespace ewasm
 {
 
-struct	address:	eth_address
+struct	address:	ewasm_address
 {
 	/// Default and converting constructor.
 	///
 	/// Initializes bytes to zeros if not other @p init value provided.
-	constexpr address(eth_address init = {}) noexcept : eth_address{init} {}
+	constexpr address(ewasm_address init = {}) noexcept : ewasm_address{init} {}
 
 	/// Converting constructor from unsigned integer value.
 	///
 	/// This constructor assigns the @p v value to the last 8 bytes [12:19]
 	/// in big-endian order.
-	constexpr explicit address(uint64_t v) noexcept : eth_address{{
+	constexpr explicit address(uint64_t v) noexcept : ewasm_address{{
 				0,
 				0,
 				0,
@@ -68,13 +68,13 @@ struct	address:	eth_address
 
 /// The fixed size array of 32 bytes for storing 256-bit EVM values.
 ///
-/// This type wraps C ::eth_bytes32 to make sure objects of this type are always initialized.
-struct bytes32 : eth_bytes32
+/// This type wraps C ::ewasm_bytes32 to make sure objects of this type are always initialized.
+struct bytes32 : ewasm_bytes32
 {
 	/// Default and converting constructor.
 	///
 	/// Initializes bytes to zeros if not other @p init value provided.
-	constexpr bytes32(eth_bytes32 init = {}) noexcept : eth_bytes32{init} {}
+	constexpr bytes32(ewasm_bytes32 init = {}) noexcept : ewasm_bytes32{init} {}
 
 	/// Converting constructor from address
 	///
@@ -89,7 +89,7 @@ struct bytes32 : eth_bytes32
 	///
 	/// This constructor assigns the @p v value to the last 8 bytes [24:31]
 	/// in big-endian order.
-	constexpr explicit bytes32(uint64_t v) noexcept : eth_bytes32{{
+	constexpr explicit bytes32(uint64_t v) noexcept : ewasm_bytes32{{
 				0,
 				0,
 				0,

@@ -22,6 +22,7 @@ set( CMAKE_CXX_FLAGS " -Wall -O3 ${CMAKE_CXX_FLAGS} ${C_DEFINES}" )
 set ( builtins_sources
    compiler_builtins.cpp
    memops.cpp
+   ewasm_main.c
    memory.c
 )
 

@@ -5,21 +5,21 @@ static u32 fib(u32 n) {
 	return fib(n-1)+fib(n-2);
 }
 
-static eth_argument	arg1{UINT64};
-eth_method	_methods[]={
+static ewasm_argument	arg1{UINT64};
+ewasm_method	_methods[]={
 	{(char *)"constructor", 0, 0, 0,},
 	{(char *)"fib", 0x73181a7b, 1, 0, &arg1,},
 	{(char *)"owner", 0x8da5cb5b, 0, 0,},
 };
 
-extern "C" eth_ABI __Contract_ABI={3, _methods};
+extern "C" ewasm_ABI __Contract_ABI={3, _methods};
 
 using namespace	ewasm;
 
 static	byte	ret[32]={0,0,0,0, 0,0,0,10};
 static	bytes32	key0(1), val32;
-extern "C" void eth_main(const u32 Id, const byte* pBuff, const u32 pLen,
-			const eth_method *mtdPtr)
+extern "C" void ewasm_main(const u32 Id, const byte* pBuff, const u32 pLen,
+			const ewasm_method *mtdPtr)
 {
 	u32 n = 10;
 	switch (Id) {

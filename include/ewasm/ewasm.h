@@ -65,15 +65,15 @@ typedef int64_t i64; // same as i64 in WebAssembly
 
 //typedef uint8_t* bytes; // an array of bytes with unrestricted length
 //typedef uint8_t bytes32[32]; // an array of 32 bytes
-typedef struct	eth_bytes32
+typedef struct	ewasm_bytes32
 {
 	uint8_t	bytes[32];
-} eth_bytes32;
-typedef struct eth_bytes32	eth_uint256be;
-typedef struct	eth_address
+} ewasm_bytes32;
+typedef struct ewasm_bytes32	ewasm_uint256be;
+typedef struct	ewasm_address
 {
 	uint8_t bytes[20]; // an array of 20 bytes
-} eth_address;
+} ewasm_address;
 typedef uint32_t u32;
 typedef uint64_t u64;
 typedef unsigned __int128 u128; // a 128 bit number, represented as a 16 bytes long little endian unsigned integer in memory, not sure if this works
@@ -186,26 +186,41 @@ extern unsigned long __builtin_wasm_memory_size(int);	// arg must be zero until 
 
 // ethereum ABI
 #ifdef	__cplusplus
-class	bytes {
-public:
-	bytes() = default;
-	bytes(const bytes&) = default;
-	bytes(void *dp, size_t siz) : _data((uint8_t *)dp), _size(siz) {}
-	bool operator==(const bytes &bs) const noexcept {
-		if (_size != bs._size) return false;
-		return memcmp(_data, bs._data, _size) == 0;
-	}
-	const size_t size() const noexcept { return _size; }
-	uint8_t *data() const noexcept { return _data;}
-private:
-	uint8_t	*_data=nullptr;
+struct	ewasm_bytes
+{
+	void	*_data=nullptr;
 	uint32_t	_size=0;
 };
 
+struct	bytes : ewasm_bytes {
+	constexpr bytes(ewasm_bytes init = {}) noexcept : ewasm_bytes{init} {}
+	explicit bytes(const char *s) noexcept :
+			ewasm_bytes{(void *)s, (uint32_t)strlen(s)} {}
+	constexpr inline explicit operator bool() const noexcept;
+};
+
+constexpr bool operator==(const bytes &a, const bytes &b) noexcept {
+	if (a._size != b._size) return false;
+	if (a._size == 0) return true;
+	return memcmp(a._data, b._data, a._size) == 0;
+}
+
+constexpr bool operator!=(const bytes &a, const bytes &b) noexcept {
+	return !(a==b);
+}
+
+constexpr inline bytes::operator bool() const noexcept {
+	return this->_size != 0 && this->_data != nullptr;
+}
+
 using string = bytes;
+
+bytes operator""_bytes (const char* s) noexcept{
+	return bytes(ewasm_bytes{(void *)s, strlen(s)});
+}
 #endif
 
-enum	eth_argType {
+enum	ewasm_argType {
 	UINT32 = 0,
 	UINT64 = 1,
 	UINT128= 2,
@@ -219,38 +234,38 @@ enum	eth_argType {
 	BYTES  = 10,
 };
 
-typedef struct eth_argument
+typedef struct ewasm_argument
 {
 	i32		_type;
 	void	*pValue;	// for int/uint 128, 256 and bytes
 	u64		_nValue;
-}	eth_argument;
+}	ewasm_argument;
 
-typedef struct eth_method
+typedef struct ewasm_method
 {
 	char	*Name;	// name of method
 	u32		Id;		// uint32be ID of method, 0 for Constructor
 	int		nParams;
 	int		nResults;
-	eth_argument	*inputs;
-	eth_argument	*outputs;
-}	eth_method;
+	ewasm_argument	*inputs;
+	ewasm_argument	*outputs;
+}	ewasm_method;
 
-typedef struct eth_ABI
+typedef struct ewasm_ABI
 {
-	uint32_t	nMethods;	// >0, at least constructor
-	eth_method	*methods;	// the first method MUST BE constructor
-}	eth_ABI;
+	uint32_t		nMethods;	// >0, at least constructor
+	ewasm_method	*methods;	// the first method MUST BE constructor
+}	ewasm_ABI;
 
 // ethereum ABI
 #ifdef	__cplusplus
 extern "C" {            /* Assume C declarations for C++ */
 #endif
 //extern u32 getCallMethodID();
-//extern int decodeParam(eth_argument *, int);
-extern	eth_ABI	__Contract_ABI;
-extern	void eth_main(const u32 Id, const byte*, const u32, const eth_method *);
-extern int encodeResult(eth_argument *, const int);
+//extern int decodeParam(ewasm_argument *, int);
+extern	ewasm_ABI	__Contract_ABI;
+extern	void ewasm_main(const u32 Id, const byte*, const u32, const ewasm_method *);
+extern int encodeResult(ewasm_argument *, const int);
 
 #ifdef	__cplusplus
 }

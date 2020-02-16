@@ -7,7 +7,7 @@
 
 if [ -d ../include/ewasm ]; then
 	INCD=../include
-	LIBPATH=../build/src
+	LIBPATH=../build/rt
 	OPTS=""
 else
 	INCD=${HOME}/opt/ewasm/include
@@ -38,7 +38,7 @@ if [ "$FILE" = "" ]; then
 	exit 0
 fi
 
-echo "build $# ${FILE} with opt ${OPTS}"
+echo "build ${FILE} with opt ${OPTS}"
 compile $1
 OBJS=${FILE}.o
 if [ $# -gt 1 ]; then
@@ -50,6 +50,7 @@ fi
 #clang -c -O3 -Wall -I${INCD}/opt/ewasm/include --target=wasm32 ${FILE}.c
 #clang -c ${OPTS} -Wall -I${INCD} --target=wasm32 ${FILE}.c
 
+#echo "ewasm lib dir is ${LIBPATH}"
 wasm-ld --no-entry --allow-undefined-file=${HOME}/opt/ewasm/ewasm.syms --export=main --strip-all ${OBJS} -L${LIBPATH} -lrt -o ${FILE}.wasm
 rm -f ${OBJS}
 #wasm-dis /tmp/${FILE}.wasm | sed -s 's/Main/main/' > /tmp/${FILE}.wat

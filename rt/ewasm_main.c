@@ -9,7 +9,7 @@ void main() // __attribute__((export_name("main")))
 	// constructor with null input while no arguments
 	// constructor called w/out method ID?
 	u32	param_off=0;
-	eth_method*	mtdPtr = __Contract_ABI.methods;
+	ewasm_method*	mtdPtr = __Contract_ABI.methods;
 	if ( ((in_len=eth_getCallDataSize())  & 0x1f) == 0 ) {
 		// Constructor
 		if (__Contract_ABI.nMethods == 0) {
@@ -45,5 +45,5 @@ void main() // __attribute__((export_name("main")))
 	}
 	if (in_len > sizeof(paramBuff)+param_off) in_len = sizeof(paramBuff);
 	eth_callDataCopy(paramBuff, param_off, in_len);
-	eth_main(mtdPtr->Id, paramBuff, in_len, mtdPtr);
+	ewasm_main(mtdPtr->Id, paramBuff, in_len, mtdPtr);
 }

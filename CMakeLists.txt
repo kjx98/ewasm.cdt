@@ -5,6 +5,8 @@ set( CMAKE_CXX_COMPILER  ${COMPILER_PATH}${CROSS_COMPILE}clang++ )
 set( CMAKE_AR  llvm-ar )
 set( CMAKE_RANLIB  llvm-ranlib )
 
+# CMAKE_INSTALL_PREFIX set install prefix
+
 project(cdt)
 
 install(DIRECTORY include 
@@ -14,4 +16,4 @@ install(FILES ewasm.syms
 install(PROGRAMS bldewasm.sh
 		DESTINATION $ENV{HOME}/bin)
 
-add_subdirectory( src )
+add_subdirectory( rt )
