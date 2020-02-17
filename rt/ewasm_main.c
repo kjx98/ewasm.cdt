@@ -2,6 +2,8 @@
 
 static	byte	ret[32]={0,0,0,0, 0,0,0,10};
 static	byte	paramBuff[512];
+static	int decodeParam(ewasm_argument *args, int argc, u32 in_len);
+
 #pragma clang diagnostic ignored "-Wmain-return-type"
 void main() // __attribute__((export_name("main")))
 {
@@ -38,12 +40,63 @@ void main() // __attribute__((export_name("main")))
 		}
 	}
 	// we should decode param here
+	in_len -= param_off;
+	if (in_len > sizeof(paramBuff)+param_off) in_len = sizeof(paramBuff);
 	u32	minLen = mtdPtr->nParams * 32;
 	if (in_len < minLen) {
-			eth_revert(0, 0);
-			// invalid, not enough params
+		eth_revert(0, 0);
+		// invalid, not enough params
 	}
-	if (in_len > sizeof(paramBuff)+param_off) in_len = sizeof(paramBuff);
+	if (decodeParam(mtdPtr->inputs, mtdPtr->nParams, in_len)) {
+		// decode inputs error
+		eth_revert(0, 0);
+		// invalid, not enough params
+	}
 	eth_callDataCopy(paramBuff, param_off, in_len);
-	ewasm_main(mtdPtr->Id, paramBuff, in_len, mtdPtr);
+	ewasm_main(mtdPtr->Id, mtdPtr);
+}
+
+static int decodeParam(ewasm_argument *args, int argc, u32 in_len)
+{
+	int	i;
+	u32	sliceOff=argc * 32;
+	u32	prOff=0;
+	for (i=0; i<argc; ++i, prOff+= 32) {
+		i32	pType = args[i]._type;
+		switch (pType) {
+		case STRING:
+		case BYTES:
+		{
+			// decode string, bytes
+			u32	rOff = u32From256(paramBuff + prOff);
+			if (rOff < sliceOff)
+				return -1;	// decode invalid offset
+			u32 rLen = u32From256(paramBuff + rOff);
+			rOff += 32;
+			if (rOff + rLen > in_len)
+				return -1;	// decode invalid length
+			args[i].pValue._data = paramBuff+rOff;
+			args[i].pValue._size = rLen;
+		}
+			break;
+		case UINT128:
+		case INT128:
+			break;
+		case UINT256:
+		case INT256:
+			break;
+		case UINT160:	// address
+			break;
+		default:
+			switch (pType) {
+			case UINT64:
+			case INT64:
+				args[i]._nValue = u64From256(paramBuff + prOff);
+				break;
+			default:
+				args[i]._nValue = u32From256(paramBuff + prOff);
+			}
+		}
+	}
+	return 0;	// success
 }

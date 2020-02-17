@@ -18,20 +18,12 @@ using namespace	ewasm;
 
 static	byte	ret[32]={0,0,0,0, 0,0,0,10};
 static	bytes32	key0(1), val32;
-extern "C" void ewasm_main(const u32 Id, const byte* pBuff, const u32 pLen,
-			const ewasm_method *mtdPtr)
+extern "C" void ewasm_main(const u32 Id, const ewasm_method *mtdPtr)
 {
 	u32 n = 10;
 	switch (Id) {
 	case 0x73181a7b:
-		if (pLen >= 32) {
-			u32	met;
-			// should be call FibValue(uint32) with Sig 0x73181a7b
-			memcpy(&met, pBuff+28, 4);
-			n = __builtin_bswap32(met);
-		} else {
-			eth_revert(ret, 8);
-		}
+		n = arg1._nValue;
 		break;
 	case 0x8da5cb5b:
 	{

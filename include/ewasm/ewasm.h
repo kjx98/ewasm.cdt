@@ -70,10 +70,15 @@ typedef struct	ewasm_bytes32
 	uint8_t	bytes[32];
 } ewasm_bytes32;
 typedef struct ewasm_bytes32	ewasm_uint256be;
-typedef struct	ewasm_address
+typedef struct ewasm_address
 {
 	uint8_t bytes[20]; // an array of 20 bytes
 } ewasm_address;
+typedef struct ewasm_bytes
+{
+	void	*_data;
+	uint32_t	_size;
+} ewasm_bytes;
 typedef uint32_t u32;
 typedef uint64_t u64;
 typedef unsigned __int128 u128; // a 128 bit number, represented as a 16 bytes long little endian unsigned integer in memory, not sure if this works
@@ -106,13 +111,18 @@ forceinline uint128_t bswap128(uint128_t ml) {
 	return ret;
 }
 
-forceinline uint128_t uint128From256(const ewasm_bytes32 *src) {
-	uint128_t *rp = (uint128_t *)(src->bytes + 16);
+forceinline uint128_t u128From256(const byte *src) {
+	uint128_t *rp = (uint128_t *)(src + 16);
 	return bswap128(*rp);
 }
 
-forceinline uint64_t uint64From256(const ewasm_bytes32 *src) {
-	uint64_t *rp = (uint64_t *)(src->bytes + 24);
+forceinline uint64_t u64From256(const byte *src) {
+	uint64_t *rp = (uint64_t *)(src + 24);
+	return __builtin_bswap64(*rp);
+}
+
+forceinline uint32_t u32From256(const byte *src) {
+	uint32_t *rp = (uint32_t *)(src + 28);
 	return __builtin_bswap64(*rp);
 }
 
@@ -197,12 +207,6 @@ extern unsigned long __builtin_wasm_memory_size(int);	// arg must be zero until 
 
 // ethereum ABI
 #ifdef	__cplusplus
-struct	ewasm_bytes
-{
-	void	*_data=nullptr;
-	uint32_t	_size=0;
-};
-
 struct	bytes : ewasm_bytes {
 	constexpr bytes(ewasm_bytes init = {}) noexcept : ewasm_bytes{init} {}
 	explicit bytes(const char *s) noexcept :
@@ -232,23 +236,26 @@ inline bytes operator""_bytes (const char* s) noexcept{
 #endif
 
 enum	ewasm_argType {
-	UINT32 = 0,
-	UINT64 = 1,
-	UINT128= 2,
-	UINT256= 3,
-	INT32  = 4,
-	INT64  = 5,
-	INT128 = 6,
-	INT256 = 7,
-	UINT160= 8,
-	STRING = 9,
-	BYTES  = 10,
+	UINT16	= 0,
+	UINT32	= 1,
+	UINT64	= 2,
+	BOOL	= 3,
+	INT16	= 4,
+	INT32	= 5,
+	INT64	= 6,
+	UINT128	= 7,
+	UINT256	= 8,
+	INT128	= 9,
+	INT256	= 10,
+	UINT160	= 11,
+	STRING	= 12,
+	BYTES	= 13,
 };
 
 typedef struct ewasm_argument
 {
 	i32		_type;
-	void	*pValue;	// for int/uint 128, 256 and bytes
+	ewasm_bytes	pValue;	// for int/uint 128, 256 and bytes
 	u64		_nValue;
 }	ewasm_argument;
 
@@ -275,7 +282,7 @@ extern "C" {            /* Assume C declarations for C++ */
 //extern u32 getCallMethodID();
 //extern int decodeParam(ewasm_argument *, int);
 extern	ewasm_ABI	__Contract_ABI;
-extern	void ewasm_main(const u32 Id, const byte*, const u32, const ewasm_method *);
+extern	void ewasm_main(const u32 Id, const ewasm_method *);
 extern int encodeResult(ewasm_argument *, const int);
 
 #ifdef	__cplusplus
