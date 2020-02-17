@@ -23,6 +23,8 @@ set ( builtins_sources
    compiler_builtins.cpp
    memops.cpp
    ewasm_main.c
+   abi.cpp
+   abi.h
    memory.c
 )
 
