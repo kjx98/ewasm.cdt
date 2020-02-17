@@ -29,7 +29,7 @@ __int128_t my_bswap128(__int128_t ml) {
 	memcpy(&ss, &ml, sizeof(ml));
 	void *dd = (void *)&ss; //malloc(sizeof(ml));
 	memcmp(&ss, dd, sizeof(ml));
-	memmove(dd, &ml, sizeof(ml));
+	memcpy(dd, &ml, sizeof(ml));
 	u64	*ptr=(u64 *)&ret;
 	ptr[0] = __builtin_bswap64(ss[1]);
 	ptr[1] = __builtin_bswap64(ss[0]);
@@ -51,6 +51,7 @@ void main() // __attribute__((export_name("main")))
 	ms++;
 	ms = strlen("test only");
 	//strcpy((char *)ret, "test only");
+	memcpy(ret, "test only", ms);
 	__int128_t	ml;
 	eth_callDataCopy(&ml, 0, 16);
 	ml = bswap128(ml);

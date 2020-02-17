@@ -79,18 +79,17 @@ typedef uint64_t u64;
 typedef unsigned __int128 u128; // a 128 bit number, represented as a 16 bytes long little endian unsigned integer in memory, not sure if this works
 //typedef uint256_t u256; // a 256 bit number, represented as a 32 bytes long little endian unsigned integer in memory, doesn't work
 typedef uint32_t i32ptr; // same as i32 in WebAssembly, but treated as a pointer to a WebAssembly memory offset
-// ethereum interface functions
 
 // builtin and host interface function as C declarations
 #ifdef	__cplusplus
 extern "C" {            /* Assume C declarations for C++ */
 #endif
 // define for memory op, no string.h with clang wasm32 target
+//void *memmove(void *dts, const void *src, size_t);
 void *memcpy(void *dts, const void *src, size_t);
-void *memmove(void *dts, const void *src, size_t);
 void *memset(void *s, int c, size_t);
 int	memcmp(const void *, const void *, size_t);
-size_t  strlen(const char *);
+size_t strlen(const char *);
 
 void *malloc(size_t);
 void *calloc(size_t count, size_t size);
@@ -107,6 +106,17 @@ forceinline uint128_t bswap128(uint128_t ml) {
 	return ret;
 }
 
+forceinline uint128_t uint128From256(const ewasm_bytes32 *src) {
+	uint128_t *rp = (uint128_t *)(src->bytes + 16);
+	return bswap128(*rp);
+}
+
+forceinline uint64_t uint64From256(const ewasm_bytes32 *src) {
+	uint64_t *rp = (uint64_t *)(src->bytes + 24);
+	return __builtin_bswap64(*rp);
+}
+
+// ethereum interface functions
 ////////////////////////////
 // EEI Method Declaration //
 ////////////////////////////
@@ -216,7 +226,7 @@ constexpr inline bytes::operator bool() const noexcept {
 
 using string = bytes;
 
-bytes operator""_bytes (const char* s) noexcept{
+inline bytes operator""_bytes (const char* s) noexcept{
 	return bytes(ewasm_bytes{(void *)s, strlen(s)});
 }
 #endif

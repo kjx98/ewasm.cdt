@@ -51,7 +51,8 @@ fi
 #clang -c ${OPTS} -Wall -I${INCD} --target=wasm32 ${FILE}.c
 
 #echo "ewasm lib dir is ${LIBPATH}"
-wasm-ld --no-entry --allow-undefined-file=${HOME}/opt/ewasm/ewasm.syms --export=main --strip-all ${OBJS} -L${LIBPATH} -lrt -o ${FILE}.wasm
+#wasm-ld --no-entry --allow-undefined-file=${HOME}/opt/ewasm/ewasm.syms --export=main --strip-all ${OBJS} -L${LIBPATH} -lrt -o ${FILE}.wasm
+wasm-ld --no-entry --allow-undefined-file=${HOME}/opt/ewasm/ewasm.syms --export-all --strip-all ${OBJS} -L${LIBPATH} -lrt -o ${FILE}.wasm
 rm -f ${OBJS}
 #wasm-dis /tmp/${FILE}.wasm | sed -s 's/Main/main/' > /tmp/${FILE}.wat
 #wasm-as /tmp/${FILE}.wat -o ${FILE}.wasm
