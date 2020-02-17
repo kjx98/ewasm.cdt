@@ -112,18 +112,66 @@ forceinline uint128_t bswap128(uint128_t ml) {
 }
 
 forceinline uint128_t u128From256(const byte *src) {
-	uint128_t *rp = (uint128_t *)(src + 16);
-	return bswap128(*rp);
+	uint128_t *rp = (uint128_t *)src;
+	return bswap128(rp[1]);
 }
 
 forceinline uint64_t u64From256(const byte *src) {
-	uint64_t *rp = (uint64_t *)(src + 24);
-	return __builtin_bswap64(*rp);
+	uint64_t *rp = (uint64_t *)src;
+	return __builtin_bswap64(rp[3]);
 }
 
 forceinline uint32_t u32From256(const byte *src) {
-	uint32_t *rp = (uint32_t *)(src + 28);
-	return __builtin_bswap64(*rp);
+	uint32_t *rp = (uint32_t *)src;
+	return __builtin_bswap32(rp[7]);
+}
+
+forceinline void u128To256(const byte *dst, uint128_t val) {
+	uint128_t *rp = (uint128_t *)dst;
+	rp[0] = 0;
+	rp[1] = bswap128(val);
+}
+
+forceinline void u64To256(const byte *dst, uint64_t val) {
+	uint64_t *rp = (uint64_t *)dst;
+	rp[0] = 0;
+	rp[1] = 0;
+	rp[2] = 0;
+	rp[3] = __builtin_bswap64(val);
+}
+
+forceinline void u32To256(const byte *dst, uint32_t val) {
+	uint32_t *rp = (uint32_t *)dst;
+	rp[0] = 0;
+	rp[1] = 0;
+	rp[2] = 0;
+	rp[3] = 0;
+	rp[4] = 0;
+	rp[5] = 0;
+	rp[6] = 0;
+	rp[7] = __builtin_bswap64(val);
+}
+
+forceinline void i128To256(const byte *dst, int128_t val) {
+	int128_t *rp = (int128_t *)dst;
+	if (val < 0)
+		rp[0] = -1;
+	else rp[0] = 0;
+	rp[1] = bswap128(val);
+}
+
+forceinline void i64To256(const byte *dst, int64_t val) {
+	int64_t *rp = (int64_t *)dst;
+	if (val < 0) {
+		rp[0] = -1;
+		rp[1] = -1;
+		rp[2] = -1;
+	} else {
+		rp[0] = 0;
+		rp[1] = 0;
+		rp[2] = 0;
+	}
+	rp[3] = __builtin_bswap64(val);
 }
 
 // ethereum interface functions
