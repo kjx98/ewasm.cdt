@@ -111,73 +111,6 @@ forceinline uint128_t bswap128(uint128_t ml) {
 	return ret;
 }
 
-forceinline uint128_t u128From256(const byte *src) {
-	uint128_t *rp = (uint128_t *)src;
-	return bswap128(rp[1]);
-}
-
-forceinline uint64_t u64From256(const byte *src) {
-	uint64_t *rp = (uint64_t *)src;
-	return __builtin_bswap64(rp[3]);
-}
-
-forceinline uint32_t u32From256(const byte *src) {
-	uint32_t *rp = (uint32_t *)src;
-	return __builtin_bswap32(rp[7]);
-}
-
-forceinline void u128To256(const byte *dst, uint128_t val) {
-	uint128_t *rp = (uint128_t *)dst;
-	rp[0] = 0;
-	rp[1] = bswap128(val);
-}
-
-forceinline void u64To256(const byte *dst, uint64_t val) {
-	uint64_t *rp = (uint64_t *)dst;
-	rp[0] = 0;
-	rp[1] = 0;
-	rp[2] = 0;
-	rp[3] = __builtin_bswap64(val);
-}
-
-forceinline void u32To256(const byte *dst, uint32_t val) {
-	uint32_t *rp = (uint32_t *)dst;
-#ifdef	DONT_UNROLL
-	for (int i=0; i<7; ++i) rp[i] = 0;
-#else
-	rp[0] = 0;
-	rp[1] = 0;
-	rp[2] = 0;
-	rp[3] = 0;
-	rp[4] = 0;
-	rp[5] = 0;
-	rp[6] = 0;
-#endif
-	rp[7] = __builtin_bswap64(val);
-}
-
-forceinline void i128To256(const byte *dst, int128_t val) {
-	int128_t *rp = (int128_t *)dst;
-	if (val < 0)
-		rp[0] = -1;
-	else rp[0] = 0;
-	rp[1] = bswap128(val);
-}
-
-forceinline void i64To256(const byte *dst, int64_t val) {
-	int64_t *rp = (int64_t *)dst;
-	if (val < 0) {
-		rp[0] = -1;
-		rp[1] = -1;
-		rp[2] = -1;
-	} else {
-		rp[0] = 0;
-		rp[1] = 0;
-		rp[2] = 0;
-	}
-	rp[3] = __builtin_bswap64(val);
-}
-
 // ethereum interface functions
 ////////////////////////////
 // EEI Method Declaration //
@@ -244,35 +177,6 @@ void forceinline exit(int i){ __builtin_unreachable(); }
 #endif
 
 // ethereum ABI
-#ifdef	__cplusplus
-struct	bytes : ewasm_bytes {
-	constexpr bytes(ewasm_bytes init = {}) noexcept : ewasm_bytes{init} {}
-	explicit bytes(const char *s) noexcept :
-			ewasm_bytes{(void *)s, (uint32_t)strlen(s)} {}
-	constexpr inline explicit operator bool() const noexcept;
-};
-
-constexpr bool operator==(const bytes &a, const bytes &b) noexcept {
-	if (a._size != b._size) return false;
-	if (a._size == 0) return true;
-	return memcmp(a._data, b._data, a._size) == 0;
-}
-
-constexpr bool operator!=(const bytes &a, const bytes &b) noexcept {
-	return !(a==b);
-}
-
-constexpr inline bytes::operator bool() const noexcept {
-	return this->_size != 0 && this->_data != nullptr;
-}
-
-using string = bytes;
-
-inline bytes operator""_bytes (const char* s) noexcept{
-	return bytes(ewasm_bytes{(void *)s, strlen(s)});
-}
-#endif
-
 enum	ewasm_argType {
 	UINT16	= 0,
 	UINT32	= 1,
@@ -320,7 +224,8 @@ extern "C" {            /* Assume C declarations for C++ */
 //extern u32 getCallMethodID();
 //extern int decodeParam(ewasm_argument *, int);
 extern	ewasm_ABI	__Contract_ABI;
-extern	void ewasm_main(const u32 Id, const ewasm_method *);
+extern	__attribute__((weak))
+void ewasm_main(const u32 Id, const ewasm_method *);
 extern int encodeResult(ewasm_argument *, const int);
 
 #ifdef	__cplusplus
