@@ -142,6 +142,9 @@ forceinline void u64To256(const byte *dst, uint64_t val) {
 
 forceinline void u32To256(const byte *dst, uint32_t val) {
 	uint32_t *rp = (uint32_t *)dst;
+#ifdef	DONT_UNROLL
+	for (int i=0; i<7; ++i) rp[i] = 0;
+#else
 	rp[0] = 0;
 	rp[1] = 0;
 	rp[2] = 0;
@@ -149,6 +152,7 @@ forceinline void u32To256(const byte *dst, uint32_t val) {
 	rp[4] = 0;
 	rp[5] = 0;
 	rp[6] = 0;
+#endif
 	rp[7] = __builtin_bswap64(val);
 }
 
@@ -235,20 +239,6 @@ extern int __builtin_ctzll(unsigned long long); 	// wasm i64.ctz opcode
 
 void forceinline exit(int i){ __builtin_unreachable(); }
 
-// follow should move to internal of memory.c
-////////////////////////////
-// Memory Managment Stuff //
-////////////////////////////
-
-extern unsigned char __heap_base;	// heap_base is immutable position where their model of heap grows down from, can ignore
-extern unsigned char __data_end;	// data_end is immutable position in memory up to where statically allocated things are
-extern unsigned long __builtin_wasm_memory_grow(int, unsigned long);	// first arg is mem idx 0, second arg is pages
-extern unsigned long __builtin_wasm_memory_size(int);	// arg must be zero until more memory instances are available
-
-// sample uses:
-//  unsigned char* heap_base = &__heap_base;
-//  unsigned char* data_end = &__data_end;
-//  unsigned int memory_size = __builtin_wasm_memory_size(0);
 #ifdef	__cplusplus
 }
 #endif

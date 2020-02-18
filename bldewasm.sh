@@ -8,7 +8,7 @@
 if [ -d ../include/ewasm ]; then
 	INCD=../include
 	LIBPATH=../build/rt
-	OPTS=""
+	OPTS="-O2"
 	EXPO="--export-all"
 else
 	INCD=${HOME}/opt/ewasm/include
@@ -27,10 +27,10 @@ elif [ -f ${SFIL}.cpp ]; then
 fi
 if [ "${SRC}" != "" ]; then
 	echo "compile c++ ${SRC}"
-	clang++ -c ${OPTS} -Wall -I${INCD} --target=wasm32 ${SRC}
+	clang++ -c ${OPTS} -Wall -Wpedantic -I${INCD} --target=wasm32 ${SRC}
 else
 	echo "compile c ${SFIL}"
-	clang -c ${OPTS} -Wall -I${INCD} --target=wasm32 ${SFIL}.c
+	clang -c ${OPTS} -Wall -Wpedantic -I${INCD} --target=wasm32 ${SFIL}.c
 fi
 }
 

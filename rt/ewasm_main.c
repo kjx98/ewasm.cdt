@@ -4,6 +4,7 @@
 static	byte	ret[32]={0,0,0,0, 0,0,0,10};
 
 #pragma clang diagnostic ignored "-Wmain-return-type"
+__attribute__((weak))
 void main() // __attribute__((export_name("main")))
 {
 	u32	in_len;
@@ -14,6 +15,7 @@ void main() // __attribute__((export_name("main")))
 	if ( ((in_len=eth_getCallDataSize())  & 0x1f) == 0 ) {
 		// Constructor
 		if (__Contract_ABI.nMethods == 0) {
+			// no Constructor, for special test
 			eth_finish(ret, 8);
 		}
 		if (__Contract_ABI.methods == 0) {
@@ -29,7 +31,7 @@ void main() // __attribute__((export_name("main")))
 		u32 	met;
 		eth_callDataCopy(&met, 0, 4);
 		met = __builtin_bswap32(met);
-		u32	i;
+		int	i;
 		for(i=1; i<__Contract_ABI.nMethods; ++i, ++mtdPtr) {
 			if (mtdPtr->Id == met) break;
 		}
@@ -45,4 +47,6 @@ void main() // __attribute__((export_name("main")))
 		// invalid, not enough params
 	}
 	ewasm_main(mtdPtr->Id, mtdPtr);
+	// we should encode result and eth_finish
+	returnResult(mtdPtr->outputs, mtdPtr->nResults);
 }

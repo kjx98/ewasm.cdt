@@ -1,4 +1,5 @@
 #include <ewasm/ewasm.hpp>
+#include <assert.h>
 //#include <type_traits>
 
 static	byte	paramBuff[512];
@@ -66,8 +67,11 @@ int decodeParam(ewasm_argument *args, int argc, u32 in_len)
 	return 0;	// success
 }
 
+extern "C" __attribute__((noreturn))
 void returnResult(ewasm_argument *args, int nRet)
 {
+	if (nRet == 0) eth_finish(nullptr, 0);
+	assert(args != nullptr); // , "outputs with nullptr");
 	u32	resLen=0;
 	u32	sliceOff=nRet * 32;
 	u32	prOff=0;
@@ -79,14 +83,11 @@ void returnResult(ewasm_argument *args, int nRet)
 		case BYTES:
 		{
 			// decode string, bytes
-			u32	rOff = sliceOff;
-			u32To256(resBuff + prOff, rOff);
-			if (rOff < sliceOff)
-				eth_revert(0, 0);
+			u32To256(resBuff + prOff, sliceOff);
 			u32 rLen = args[i].pValue._size;
-			if (rOff + rLen > sizeof(resBuff))
+			if (sliceOff +32 + rLen > sizeof(resBuff))
 				eth_revert(0, 0);
-			u32To256(resBuff + rOff, rLen);
+			u32To256(resBuff + sliceOff, rLen);
 			sliceOff += 32;
 			memcpy(resBuff+sliceOff, args[i].pValue._data, rLen);
 			sliceOff += (rLen + 31) & 0xffe0;
@@ -97,11 +98,9 @@ void returnResult(ewasm_argument *args, int nRet)
 		case UINT256:
 		case INT256:
 			memcpy(resBuff+prOff, args[i].pValue._data, 32);
-			sliceOff += 32;
 			break;
 		case UINT160:	// address
 			memcpy(resBuff+prOff, args[i].pValue._data, 32);
-			sliceOff += 32;
 			break;
 		default:
 			switch (pType) {
@@ -109,6 +108,16 @@ void returnResult(ewasm_argument *args, int nRet)
 				u64To256(resBuff+prOff, args[i]._nValue);
 				break;
 			case INT64:
+				i64To256(resBuff+prOff, args[i]._nValue);
+				break;
+			case INT16:
+				// extend int16 to int64
+				args[i]._nValue = (int64_t)((int16_t)args[i]._nValue);
+				i64To256(resBuff+prOff, args[i]._nValue);
+				break;
+			case INT32:
+				// extend int32 to int64
+				args[i]._nValue = (int64_t)((int32_t)args[i]._nValue);
 				i64To256(resBuff+prOff, args[i]._nValue);
 				break;
 			default:
@@ -119,4 +128,5 @@ void returnResult(ewasm_argument *args, int nRet)
 	resLen = sliceOff;
 	// code result
 	eth_finish(resBuff, resLen);
+	__builtin_unreachable();
 }

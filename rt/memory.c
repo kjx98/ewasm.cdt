@@ -14,6 +14,21 @@
 #define GROWABLE_MEMORY true	// whether we want memory to be growable; true/false
 
 #ifdef	not_work
+
+// follow should move to internal of memory.c
+////////////////////////////
+// Memory Managment Stuff //
+////////////////////////////
+
+extern unsigned char __heap_base;	// heap_base is immutable position where their model of heap grows down from, can ignore
+extern unsigned char __data_end;	// data_end is immutable position in memory up to where statically allocated things are
+extern unsigned long __builtin_wasm_memory_grow(int, unsigned long);	// first arg is mem idx 0, second arg is pages
+extern unsigned long __builtin_wasm_memory_size(int);	// arg must be zero until more memory instances are available
+
+// sample uses:
+//  unsigned char* heap_base = &__heap_base;
+//  unsigned char* data_end = &__data_end;
+//  unsigned int memory_size = __builtin_wasm_memory_size(0);
 void* malloc(const size_t size){
   //  Our malloc is naive: we only append to the end of the previous allocation, starting at data_end. This is tuned for short runtimes where memory management cost is expensive, not many things are allocated, or not many things are freed.
   //  It seems (in May 2019) that LLVM->Wasm starts data_end at 1024 plus anything that is statically stored in memory at compile-time. So our heap starts at data_end and grows upwards.

@@ -5,24 +5,18 @@ typedef	unsigned int	u32;
 typedef	unsigned short	u16;
 typedef unsigned long long u64;
 
-#ifdef ommit
-#define	DECL_IMPORT(name, args) eth_##name args \
-	__attribute__((import_module("ethereum"),import_name( #name )));
-void DECL_IMPORT(finish, (char* _off, i32 _len))
-//void eth_finish(char* _off, i32 _len) __attribute__((import_module("ethereum"), import_name("finish")));
-i32  eth_getCallDataSize() __attribute__((import_module("ethereum"),import_name("getCallDataSize")));
-void eth_callDataCopy(void *res, i32 dOff, i32 dLen) __attribute__((import_module("ethereum"),import_name("callDataCopy")));
-#endif
 //size_t	strlen(const char *);
 char*	strcpy(char *__restrict, const char*__restrict);
 char*	strncpy(char *__restrict, const char*__restrict, size_t);
 char*	strchr(const char *, int);
 int	strncmp(const char *, const char*, size_t);
 
+__attribute__((used)) 
 __int128_t max(__int128_t a, __int128_t b) {
    return a*b; //a > b ? a: b;
 }
 
+__attribute__((used)) 
 __int128_t my_bswap128(__int128_t ml) {
 	__int128_t ret;
 	u64	ss[2];
