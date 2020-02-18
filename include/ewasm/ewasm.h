@@ -21,7 +21,7 @@
 #ifndef __EWASM_H__
 #define __EWASM_H__
 
-#if	__clang_major__ >= 8
+#if	__clang_major__ > 8
 #include <stddef.h>
 #include <stdint.h>
 #else
@@ -117,6 +117,8 @@ forceinline uint128_t bswap128(uint128_t ml) {
 ////////////////////////////
 #define DECL_IMPORT(name, args) eth_##name args \
     __attribute__((import_module("ethereum"),import_name( #name )))
+#define DEBUG_IMPORT(name, args) debug_##name args \
+    __attribute__((import_module("debug"),import_name( #name )))
 
 #ifdef	__cplusplus
 namespace	ewasm {
@@ -132,6 +134,10 @@ void DECL_IMPORT(getCaller, (address* acct));
 void DECL_IMPORT(getTxOrigin, (address* acct));
 void DECL_IMPORT(log, (void* dat, u32 dLen, u32 numTopics, bytes32* to1, bytes32* to2, bytes32* to3, bytes32* to4));
 void DECL_IMPORT(selfDestruct, (address* selfAddr));
+void DEBUG_IMPORT(printMem, (void*, u32));
+void DEBUG_IMPORT(printMemHex, (void*, u32));
+void DEBUG_IMPORT(printStorage, (bytes32 *));
+void DEBUG_IMPORT(printStorageHex, (bytes32 *));
 #else
 void DECL_IMPORT(getAddress, (void* res));
 void DECL_IMPORT(getExternalBalance, (void* acct, u128 *bal));
@@ -141,6 +147,10 @@ void DECL_IMPORT(getCaller, (void* acct));
 void DECL_IMPORT(getTxOrigin, (void* acct));
 void DECL_IMPORT(log, (void* dat, u32 dLen, u32 numTopics, void* to1, void* to2, void* to3, void* to4));
 void DECL_IMPORT(selfDestruct, (void* selfAddr));
+void DEBUG_IMPORT(printMem, (void*, u32));
+void DEBUG_IMPORT(printMemHex, (void*, u32));
+void DEBUG_IMPORT(printStorage, (void *));
+void DEBUG_IMPORT(printStorageHex, (void *));
 #endif
 
 void DECL_IMPORT(useGas, (i64 gas));

@@ -7,7 +7,7 @@ static u32 fib(u32 n) {
 
 static ewasm_argument	arg1{UINT64};
 ewasm_method	_methods[]={
-	{(char *)"constructor", 0, 0, 0,},
+	{(char *)"constructor", 0x861731d5, 0, 0,},
 	{(char *)"fib", 0x73181a7b, 1, 0, &arg1,},
 	{(char *)"owner", 0x8da5cb5b, 0, 0,},
 };
@@ -28,6 +28,7 @@ extern "C" void ewasm_main(const u32 Id, const ewasm_method *mtdPtr)
 	case 0x8da5cb5b:
 	{
 		// should be call owner() with Sig 0x8da5cb5b
+		debug_printStorageHex(&key0);
 		eth_storageLoad(&key0, &val32);
 		eth_finish(&val32,32);
 		return;
@@ -39,6 +40,7 @@ extern "C" void ewasm_main(const u32 Id, const ewasm_method *mtdPtr)
 		eth_getCaller(&sender);
 		bytes32	val32(sender);
 		eth_storageStore(&key0, &val32);
+		debug_printStorageHex(&key0);
 		eth_finish(ret, 0);
 		return;
 	}

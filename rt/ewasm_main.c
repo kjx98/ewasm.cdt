@@ -48,5 +48,5 @@ void main() // __attribute__((export_name("main")))
 	}
 	ewasm_main(mtdPtr->Id, mtdPtr);
 	// we should encode result and eth_finish
-	returnResult(mtdPtr->outputs, mtdPtr->nResults);
+	//returnResult(mtdPtr->outputs, mtdPtr->nResults);
 }

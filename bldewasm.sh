@@ -9,7 +9,9 @@ if [ -d ../include/ewasm ]; then
 	INCD=../include
 	LIBPATH=../build/rt
 	OPTS="-O2"
-	EXPO="--export-all"
+	#EXPO="--export-all"
+	#EXPO="--export=main --export-all"
+	EXPO="--export=main"
 else
 	INCD=${HOME}/opt/ewasm/include
 	LIBPATH=${HOME}/opt/ewasm/lib
