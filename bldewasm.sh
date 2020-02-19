@@ -5,6 +5,8 @@
 # llvm 8 may export __heap_base and __data_end
 #
 
+SUF=""
+which clang-9 && SUF="-9"
 if [ -d ../include/ewasm ]; then
 	INCD=../include
 	LIBPATH=../build/rt
@@ -30,10 +32,10 @@ elif [ -f ${SFIL}.cpp ]; then
 fi
 if [ "${SRC}" != "" ]; then
 	echo "compile c++ ${SRC}"
-	clang++ -c ${OPTS} -Wall -Wpedantic -I${INCD} --target=wasm32 ${SRC}
+	clang++${SUF} -c ${OPTS} -Wall -Wpedantic -I${INCD} --target=wasm32 ${SRC}
 else
 	echo "compile c ${SFIL}"
-	clang -c ${OPTS} -Wall -Wpedantic -I${INCD} --target=wasm32 ${SFIL}.c
+	clang${SUF} -c ${OPTS} -Wall -Wpedantic -I${INCD} --target=wasm32 ${SFIL}.c
 fi
 }
 
@@ -58,7 +60,7 @@ fi
 #echo "ewasm lib dir is ${LIBPATH}"
 echo "wasm-ld export is ${EXPO}"
 #wasm-ld --no-entry --allow-undefined-file=${HOME}/opt/ewasm/ewasm.syms --export=main --strip-all ${OBJS} -L${LIBPATH} -lrt -o ${FILE}.wasm
-wasm-ld --no-entry --allow-undefined-file=${HOME}/opt/ewasm/ewasm.syms ${EXPO} --strip-all ${OBJS} -L${LIBPATH} -lrt -o ${FILE}.wasm
+wasm-ld${SUF} --no-entry --allow-undefined-file=${HOME}/opt/ewasm/ewasm.syms ${EXPO} --strip-all ${OBJS} -L${LIBPATH} -lrt -o ${FILE}.wasm
 rm -f ${OBJS}
 #wasm-dis /tmp/${FILE}.wasm | sed -s 's/Main/main/' > /tmp/${FILE}.wat
 #wasm-as /tmp/${FILE}.wat -o ${FILE}.wasm
