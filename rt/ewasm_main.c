@@ -1,6 +1,8 @@
 #include <ewasm/ewasm.h>
 #include "abi.h"
+#include "ewasm_main.h"
 
+byte	__abiBuff[MAX_ABI_INPUT];
 static	byte	ret[32]={0,0,0,0, 0,0,0,10};
 
 #pragma clang diagnostic ignored "-Wmain-return-type"
@@ -19,12 +21,14 @@ void main() // __attribute__((export_name("main")))
 			eth_finish(ret, 8);
 		}
 		if (__Contract_ABI.methods == 0) {
+			ewasm_print("WARN! no method in ABI");
 			eth_revert(0, 0);
 			// invalid, no Constructor
 		}
 	} else {
 		param_off = 4;	// Offset ID, 4 bytes
 		if ( in_len < param_off || ( ((in_len-param_off)&0x1f) != 0 ) ) {
+			ewasm_print("WARN! input length invalid");
 			eth_revert(0, 0);
 			// invalid, param length
 		}
@@ -32,10 +36,13 @@ void main() // __attribute__((export_name("main")))
 		eth_callDataCopy(&met, 0, 4);
 		met = __builtin_bswap32(met);
 		int	i;
+		++mtdPtr;	// sacn from 2nd, first is constructor
 		for(i=1; i<__Contract_ABI.nMethods; ++i, ++mtdPtr) {
 			if (mtdPtr->Id == met) break;
 		}
 		if (i >= __Contract_ABI.nMethods) {
+			ewasm_print("WARN! no found method with ID");
+			debug_printMemHex(&met, 4);
 			eth_revert(0, 0);
 			// invalid, no such method
 		}
@@ -48,5 +55,5 @@ void main() // __attribute__((export_name("main")))
 	}
 	ewasm_main(mtdPtr->Id, mtdPtr);
 	// we should encode result and eth_finish
-	//returnResult(mtdPtr->outputs, mtdPtr->nResults);
+	returnResult(mtdPtr->outputs, mtdPtr->nResults);
 }

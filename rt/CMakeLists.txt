@@ -18,14 +18,25 @@ endif()
 # Defines builtins library
 #set(C_DEFINES, "--target=wasm32")
 set( CMAKE_C_FLAGS " -Wall -O3 ${CMAKE_C_FLAGS} ${C_DEFINES}" )
-set( CMAKE_CXX_FLAGS " -Wall -O3 ${CMAKE_CXX_FLAGS} ${C_DEFINES}" )
+#set( CMAKE_CXX_FLAGS "-std=c++17 -Wall -O3 ${CMAKE_CXX_FLAGS} ${C_DEFINES}" )
+set( CMAKE_CXX_FLAGS "-Wall -O3 ${CMAKE_CXX_FLAGS} ${C_DEFINES}" )
+#   compiler_builtins.cpp
 set ( builtins_sources
-   compiler_builtins.cpp
-   memops.cpp
-   ewasm_main.c
-   abi.cpp
-   abi.h
-   memory.c
+	ashti3.cpp
+	divti3.cpp
+	lshti3.cpp
+	modti3.cpp
+	multi3.cpp
+	memops.cpp
+	memcmp.cpp
+	memrcpy.cpp
+	strlen.cpp
+	ewasm_main.c
+	abi.cpp
+	abi_ret.cpp
+	abi.h
+	malloc.cpp
+	memory.c
 )
 
 add_definitions( "--target=wasm32" )

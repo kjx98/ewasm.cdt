@@ -6,9 +6,10 @@ static u32 fib(u32 n) {
 }
 
 static ewasm_argument	arg1{UINT64};
+static ewasm_argument	result1{UINT64};
 ewasm_method	_methods[]={
-	{(char *)"constructor", 0x861731d5, 0, 0,},
-	{(char *)"fib", 0x73181a7b, 1, 0, &arg1,},
+	{(char *)"constructor", 0, 0, 0,},
+	{(char *)"fib", 0x73181a7b, 1, 1, &arg1, &result1},
 	{(char *)"owner", 0x8da5cb5b, 0, 0,},
 };
 
@@ -34,18 +35,21 @@ extern "C" void ewasm_main(const u32 Id, const ewasm_method *mtdPtr)
 		return;
 	}
 		break;
-	case 0x861731d5:
+	case 0:
 		// Constructor
 		address	sender;
 		eth_getCaller(&sender);
 		bytes32	val32(sender);
 		eth_storageStore(&key0, &val32);
-		debug_printStorageHex(&key0);
 		eth_finish(ret, 0);
 		return;
 	}
+#ifdef	ommit
 	u32 res = __builtin_bswap32(fib(n));
 	*(u32 *)(ret+4) = 0;
 	*(u32 *)(ret+28) = res;
 	eth_finish(ret,32);
+#else
+	result1._nValue = fib(n);
+#endif
 }

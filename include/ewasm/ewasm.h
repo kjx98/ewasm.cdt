@@ -91,7 +91,8 @@ extern "C" {            /* Assume C declarations for C++ */
 #endif
 // define for memory op, no string.h with clang wasm32 target
 //void *memmove(void *dts, const void *src, size_t);
-void *memcpy(void *dts, const void *src, size_t);
+void *memcpy(void *dst, const void *src, size_t);
+void *memrcpy(void *dst, const void *src, size_t);
 void *memset(void *s, int c, size_t);
 int	memcmp(const void *, const void *, size_t);
 size_t strlen(const char *);
@@ -134,6 +135,7 @@ void DECL_IMPORT(getCaller, (address* acct));
 void DECL_IMPORT(getTxOrigin, (address* acct));
 void DECL_IMPORT(log, (void* dat, u32 dLen, u32 numTopics, bytes32* to1, bytes32* to2, bytes32* to3, bytes32* to4));
 void DECL_IMPORT(selfDestruct, (address* selfAddr));
+void DEBUG_IMPORT(print, (void*, u32));
 void DEBUG_IMPORT(printMem, (void*, u32));
 void DEBUG_IMPORT(printMemHex, (void*, u32));
 void DEBUG_IMPORT(printStorage, (bytes32 *));
@@ -147,6 +149,7 @@ void DECL_IMPORT(getCaller, (void* acct));
 void DECL_IMPORT(getTxOrigin, (void* acct));
 void DECL_IMPORT(log, (void* dat, u32 dLen, u32 numTopics, void* to1, void* to2, void* to3, void* to4));
 void DECL_IMPORT(selfDestruct, (void* selfAddr));
+void DEBUG_IMPORT(print, (void*, u32));
 void DEBUG_IMPORT(printMem, (void*, u32));
 void DEBUG_IMPORT(printMemHex, (void*, u32));
 void DEBUG_IMPORT(printStorage, (void *));
@@ -170,6 +173,7 @@ u64 DECL_IMPORT(getBlockTimestamp, () );
 void DECL_IMPORT(finish, (void* _off, u32 _len));
 void DECL_IMPORT(revert, (void* _off, u32 _len));
 
+#define	ewasm_print(x) debug_print(x, strlen(x))
 
 ///////////////////////////////////////////////////
 // Useful Intrinsics, Not Including Memory Stuff //

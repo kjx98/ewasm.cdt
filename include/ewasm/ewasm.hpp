@@ -82,8 +82,42 @@ struct bytes32 : ewasm_bytes32
 	/// in big-endian order.
 	explicit bytes32(const address &addr) noexcept {
 		memset(bytes, 0, 12);
-		memcpy(bytes, addr.bytes, 20);
+		memcpy(bytes+12, addr.bytes, 20);
 	}
+	void from128u(const uint128_t *u128p) noexcept {
+		memset(bytes, 0, 16);
+		memrcpy(bytes+16, (void *)u128p, 16);
+	}
+	template<typename T>void fromUint(const T v) noexcept {
+		static_assert(__is_unsigned(T) && __is_integral(T), "unsigned integral");
+		constexpr uint32_t	off = 32 - sizeof(T);
+		memrcpy(bytes+off, (void *)&v, sizeof(T));
+	}
+	template<typename T>void fromInt(const T v) noexcept {
+		static_assert(__is_signed(T) && __is_integral(T), "unsigned integral");
+		constexpr uint32_t	off = 32 - sizeof(T);
+		memrcpy(bytes+off, (void *)&v, sizeof(T));
+	}
+#ifdef	ommit
+	void from64u(const uint64_t v) noexcept {
+		memset(bytes, 0, 24);
+		*(uint64_t *)(bytes+24) = __builtin_bswap64(v);
+	}
+	void from64s(const int64_t v) noexcept {
+		memset(bytes, 0, 24);
+		*(uint64_t *)(bytes+24) = __builtin_bswap64(v);
+	}
+	int128_t to128s() noexcept {
+		int128_t	ret;
+		memrcpy((void *)&ret, bytes+16, 16);
+		return ret;
+	}
+	uint128_t to128u() noexcept {
+		int128_t	ret;
+		memrcpy((void *)&ret, bytes+16, 16);
+		return ret;
+	}
+#endif
 
 	/// Converting constructor from unsigned integer value.
 	///
@@ -303,14 +337,20 @@ forceinline void u128To256(const byte *dst, uint128_t val) {
 }
 
 forceinline void u64To256(const byte *dst, uint64_t val) {
+#ifdef	ommit
 	uint64_t *rp = (uint64_t *)dst;
 	rp[0] = 0;
 	rp[1] = 0;
 	rp[2] = 0;
 	rp[3] = __builtin_bswap64(val);
+#else
+	bytes32	*rp=static_cast<bytes32 *>((void *)dst);
+	rp->fromUint(val);
+#endif
 }
 
 forceinline void u32To256(const byte *dst, uint32_t val) {
+#ifdef	ommit
 	uint32_t *rp = (uint32_t *)dst;
 #ifdef	DONT_UNROLL
 	for (int i=0; i<7; ++i) rp[i] = 0;
@@ -324,6 +364,10 @@ forceinline void u32To256(const byte *dst, uint32_t val) {
 	rp[6] = 0;
 #endif
 	rp[7] = __builtin_bswap64(val);
+#else
+	bytes32	*rp=static_cast<bytes32 *>((void *)dst);
+	rp->fromUint(val);
+#endif
 }
 
 forceinline void i128To256(const byte *dst, int128_t val) {
@@ -335,6 +379,7 @@ forceinline void i128To256(const byte *dst, int128_t val) {
 }
 
 forceinline void i64To256(const byte *dst, int64_t val) {
+#ifdef	ommit
 	int64_t *rp = (int64_t *)dst;
 	if (val < 0) {
 		rp[0] = -1;
@@ -346,6 +391,10 @@ forceinline void i64To256(const byte *dst, int64_t val) {
 		rp[2] = 0;
 	}
 	rp[3] = __builtin_bswap64(val);
+#else
+	bytes32	*rp=static_cast<bytes32 *>((void *)dst);
+	rp->fromInt(val);
+#endif
 }
 
 }

@@ -31,6 +31,7 @@ eth_getReturnDataSize
 eth_returnDataCopy
 eth_selfDestruct
 eth_getBlockTimestamp
+debug_print
 debug_printMem
 debug_printMemHex
 debug_printStorage
