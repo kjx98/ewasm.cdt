@@ -13,8 +13,6 @@
 #define PAGE_SIZE 65536
 #define GROWABLE_MEMORY true	// whether we want memory to be growable; true/false
 
-#ifdef	not_work
-
 // follow should move to internal of memory.c
 ////////////////////////////
 // Memory Managment Stuff //
@@ -64,4 +62,3 @@ void* malloc(const size_t size){
   heap_ptr = (uint8_t*)total_bytes_needed;
   return (void*)(heap_ptr-size);
 }
-#endif

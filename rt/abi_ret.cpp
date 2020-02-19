@@ -10,7 +10,7 @@ extern "C" __attribute__((noreturn))
 void returnResult(ewasm_argument *args, int nRet)
 {
 	if (nRet == 0) eth_finish(nullptr, 0);
-	//assert(args != nullptr); // , "outputs with nullptr");
+	//assert(args != nullptr);
 	u32	resLen=0;
 	u32	sliceOff=nRet * 32;
 	u32	prOff=0;

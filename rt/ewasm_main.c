@@ -2,7 +2,11 @@
 #include "abi.h"
 #include "ewasm_main.h"
 
+#ifdef	USE_MALLOC_ABI
+byte	*__abiBuff; //[MAX_ABI_INPUT];
+#else
 byte	__abiBuff[MAX_ABI_INPUT];
+#endif
 static	byte	ret[32]={0,0,0,0, 0,0,0,10};
 
 #pragma clang diagnostic ignored "-Wmain-return-type"
@@ -13,6 +17,10 @@ void main() // __attribute__((export_name("main")))
 	// constructor with null input while no arguments
 	// constructor called w/out method ID?
 	u32	param_off=0;
+#ifdef	USE_MALLOC_ABI
+	__abiBuff = malloc(MAX_ABI_INPUT);
+	assert(__abiBuff != nullptr);
+#endif
 	ewasm_method*	mtdPtr = __Contract_ABI.methods;
 	if ( ((in_len=eth_getCallDataSize())  & 0x1f) == 0 ) {
 		// Constructor

@@ -9,6 +9,8 @@ set( CMAKE_RANLIB  llvm-ranlib )
 
 project(cdt)
 
+#add_definitions( "-DUSE_MALLOC_ABI")
+
 install(DIRECTORY include 
 		DESTINATION ewasm)
 install(FILES ewasm.syms

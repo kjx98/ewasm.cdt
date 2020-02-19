@@ -4,6 +4,10 @@
 
 #ifdef NDEBUG
 #define	assert(x) (void)0
+#elif	defined(__wasm__)
+#define assert(x) if (!(x)) { \
+	debug_print((void *)#x, sizeof(#x)); \
+	eth_revert(0,0); }
 #else
 #define assert(x) ((void)((x) || (__assert_fail(#x, __FILE__, __LINE__, __func__),0)))
 #endif

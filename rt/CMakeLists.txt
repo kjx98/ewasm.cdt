@@ -35,7 +35,6 @@ set ( builtins_sources
 	abi.cpp
 	abi_ret.cpp
 	abi.h
-	malloc.cpp
 	memory.c
 )
 
