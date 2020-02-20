@@ -6,7 +6,7 @@
 #
 
 SUF=""
-which clang-9 && SUF="-9"
+which wasm-ld-9 && SUF="-9"
 if [ -d ../include/ewasm ]; then
 	INCD=../include
 	LIBPATH=../build/rt

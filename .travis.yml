@@ -1,0 +1,26 @@
+dist: bonic
+language: cpp
+compiler: clang
+sudo: required
+addons:
+  apt:
+    packages:
+    - git
+    - cmake
+    - ccache
+
+branches:
+  only:
+  - master
+
+before_install:
+  - sudo apt-get update -q
+  - sudo apt-get install -y clang-9 lld-9 llvm-9 llvm
+
+install:
+  - mkdir build
+
+script:
+  - cd build
+  - cmake ..
+  - make

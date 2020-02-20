@@ -1,6 +1,9 @@
 # ewasm.cdt
 C/C++ development toolkit for EWASM
 
+[![Build Status](https://travis-ci.org/kjx98/ewasm.cdt.svg?branch=master)](
+https://travis-ci.org/kjx98/ewasm.cdt)
+
 ## Quick start
 ### download and build
 *	git clone https://github.com/kjx98/ewasm.cdt
