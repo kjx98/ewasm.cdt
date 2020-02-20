@@ -241,6 +241,8 @@ typedef struct ewasm_ABI
 	ewasm_method	*methods;	// the first method MUST BE constructor
 }	ewasm_ABI;
 
+#define	DECL_ABI(x) { sizeof(x)/sizeof(x[0]), x }
+
 // ethereum ABI
 #ifdef	__cplusplus
 extern "C" {            /* Assume C declarations for C++ */

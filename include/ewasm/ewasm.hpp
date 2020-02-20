@@ -362,7 +362,6 @@ inline bytes operator""_bytes (const char* s) noexcept{
 	return bytes(ewasm_bytes{(void *)s, strlen(s)});
 }
 
-#ifndef	ommit
 forceinline uint128_t u128From256(const byte *src) {
 	uint128_t ret;
 	memrcpy(&ret, src+16, 16); 
@@ -380,10 +379,12 @@ forceinline uint32_t u32From256(const byte *src) {
 }
 
 forceinline void u128To256(const byte *dst, uint128_t val) {
+#ifdef	ommit
 	uint128_t *rp = (uint128_t *)dst;
 	rp[0] = 0;
 	//rp[1] = bswap128(val);
-	memrcpy(&rp[1], &val, 16);
+#endif
+	memrcpy((void *)(dst+16), (void *)&val, 16);
 }
 
 forceinline void u64To256(const byte *dst, uint64_t val) {
@@ -421,12 +422,14 @@ forceinline void u32To256(const byte *dst, uint32_t val) {
 }
 
 forceinline void i128To256(const byte *dst, int128_t val) {
+#ifdef	ommit
 	int128_t *rp = (int128_t *)dst;
 	if (val < 0)
 		rp[0] = -1;
 	else rp[0] = 0;
 	//rp[1] = bswap128(val);
-	memrcpy(&rp[1], &val, 16);
+#endif
+	memrcpy((void *)(dst+16), (void *)&val, 16);
 }
 
 forceinline void i64To256(const byte *dst, int64_t val) {
@@ -447,7 +450,35 @@ forceinline void i64To256(const byte *dst, int64_t val) {
 	rp->fromInt(val);
 #endif
 }
+
+struct	method : ewasm_method {
+	constexpr method(ewasm_method init = {}) : ewasm_method{init} {}
+	template <size_t nLen, size_t iLen, size_t oLen>
+	constexpr method(const char(&s)[nLen], const u32 id,
+					const ewasm_argument (&ins)[iLen],
+					const ewasm_argument (&outs)[oLen]) : ewasm_method {{
+			(char *)s, id,
+			iLen, oLen, &ins[0], &outs[0]}}
+	{}
+	template <size_t nLen, size_t iLen>
+	constexpr method(const char(&s)[nLen], const u32 id,
+					const ewasm_argument (&ins)[iLen]) : ewasm_method {{
+			(char *)s, id,
+			iLen, 0, &ins[0]}}
+	{}
+#ifdef	ommmit
+	template <size_t nLen, size_t oLen>
+	constexpr method(const char(&s)[nLen], const u32 id, nullptr_t nullptr,
+					const ewasm_argument (&outs)[oLen]) : ewasm_method {{
+			(char *)s, id,
+			0, oLen, nullptr, &outs[0]}}
+	{}
+	template <size_t N>
+	constexpr method(const char(&s)[N], const u32 id) : ewasm_method {{
+			(char *)s, id, 0, 0, nullptr, nullptr}}
+	{}
 #endif
+};
 
 }
 #endif
