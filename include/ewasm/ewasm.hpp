@@ -60,7 +60,9 @@ struct	address:	ewasm_address
 				static_cast<uint8_t>(v >> 16),
 				static_cast<uint8_t>(v >> 8),
 				static_cast<uint8_t>(v >> 0)}}
-	{}
+	{
+		static_assert(sizeof(address) == 20, "size of address MUST be 20");
+	}
 
 	/// Explicit operator converting to bool.
 	constexpr inline explicit operator bool() const noexcept;
@@ -80,12 +82,42 @@ struct bytes32 : ewasm_bytes32
 	///
 	/// This constructor assigns the @p v value to the last 8 bytes [24:31]
 	/// in big-endian order.
-	explicit bytes32(const address &addr) noexcept {
-		memset(bytes, 0, 12);
-		memcpy(bytes+12, addr.bytes, 20);
+	constexpr bytes32(const address &addr) noexcept : ewasm_bytes32 {{
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		addr.bytes[0],
+		addr.bytes[1],
+		addr.bytes[2],
+		addr.bytes[3],
+		addr.bytes[4],
+		addr.bytes[5],
+		addr.bytes[6],
+		addr.bytes[7],
+		addr.bytes[8],
+		addr.bytes[9],
+		addr.bytes[10],
+		addr.bytes[11],
+		addr.bytes[12],
+		addr.bytes[13],
+		addr.bytes[14],
+		addr.bytes[15],
+		addr.bytes[16],
+		addr.bytes[17],
+		addr.bytes[18],
+		addr.bytes[19]}}
+	{
+		static_assert(sizeof(bytes32) == 32, "size of bytes32 MUST be 32");
 	}
 	void from128u(const uint128_t *u128p) noexcept {
-		static_assert(sizeof(bytes32) == 32, "bytes32 size not 32");
 		memset(bytes, 0, 16);
 		memrcpy(bytes+16, (void *)u128p, 16);
 	}
