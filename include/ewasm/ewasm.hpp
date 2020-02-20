@@ -85,6 +85,7 @@ struct bytes32 : ewasm_bytes32
 		memcpy(bytes+12, addr.bytes, 20);
 	}
 	void from128u(const uint128_t *u128p) noexcept {
+		static_assert(sizeof(bytes32) == 32, "bytes32 size not 32");
 		memset(bytes, 0, 16);
 		memrcpy(bytes+16, (void *)u128p, 16);
 	}
@@ -168,16 +169,24 @@ using uint256be = bytes32;
 /// Loads 64 bits / 8 bytes of data from the given @p bytes array in big-endian order.
 constexpr inline uint64_t load64be(const uint8_t* bytes) noexcept
 {
+#ifdef	ommit
     return (uint64_t{bytes[0]} << 56) | (uint64_t{bytes[1]} << 48) | (uint64_t{bytes[2]} << 40) |
            (uint64_t{bytes[3]} << 32) | (uint64_t{bytes[4]} << 24) | (uint64_t{bytes[5]} << 16) |
            (uint64_t{bytes[6]} << 8) | uint64_t{bytes[7]};
+#else
+	return __builtin_bswap64(*(uint64_t *)bytes);
+#endif
 }
 
 /// Loads 32 bits / 4 bytes of data from the given @p bytes array in big-endian order.
 constexpr inline uint32_t load32be(const uint8_t* bytes) noexcept
 {
+#ifdef	ommit
     return (uint32_t{bytes[0]} << 24) | (uint32_t{bytes[1]} << 16) | (uint32_t{bytes[2]} << 8) |
            uint32_t{bytes[3]};
+#else
+	return __builtin_bswap32(*(uint32_t *)bytes);
+#endif
 }
 
 /// The "equal to" comparison operator for the evmc::address type.
@@ -291,10 +300,16 @@ constexpr bytes32::operator bool() const noexcept
 }
 
 struct	bytes : ewasm_bytes {
-	constexpr bytes(ewasm_bytes init = {}) noexcept : ewasm_bytes{init} {}
-	explicit bytes(const char *s) noexcept :
-			ewasm_bytes{(void *)s, (uint32_t)strlen(s)} {}
+	constexpr bytes(ewasm_bytes init) noexcept : ewasm_bytes{init} {}
+	constexpr bytes() noexcept : ewasm_bytes {nullptr, 0} {}
+	template <size_t N>
+	constexpr bytes(const char (&s)[N]) noexcept :
+			ewasm_bytes{(void *)s, (uint32_t)N} {}
+	constexpr bytes(const char *str, const size_t n) noexcept : 
+			ewasm_bytes{(void *)str, (uint32_t)n} {}
 	constexpr inline explicit operator bool() const noexcept;
+	char* data() { return (char *)_data; }
+	size_t size() const { return _size; }
 };
 
 constexpr bool operator==(const bytes &a, const bytes &b) noexcept {
@@ -315,9 +330,11 @@ inline bytes operator""_bytes (const char* s) noexcept{
 	return bytes(ewasm_bytes{(void *)s, strlen(s)});
 }
 
+#ifndef	ommit
 forceinline uint128_t u128From256(const byte *src) {
-	uint128_t *rp = (uint128_t *)src;
-	return bswap128(rp[1]);
+	uint128_t ret;
+	memrcpy(&ret, src+16, 16); 
+	return ret;
 }
 
 forceinline uint64_t u64From256(const byte *src) {
@@ -333,7 +350,8 @@ forceinline uint32_t u32From256(const byte *src) {
 forceinline void u128To256(const byte *dst, uint128_t val) {
 	uint128_t *rp = (uint128_t *)dst;
 	rp[0] = 0;
-	rp[1] = bswap128(val);
+	//rp[1] = bswap128(val);
+	memrcpy(&rp[1], &val, 16);
 }
 
 forceinline void u64To256(const byte *dst, uint64_t val) {
@@ -375,7 +393,8 @@ forceinline void i128To256(const byte *dst, int128_t val) {
 	if (val < 0)
 		rp[0] = -1;
 	else rp[0] = 0;
-	rp[1] = bswap128(val);
+	//rp[1] = bswap128(val);
+	memrcpy(&rp[1], &val, 16);
 }
 
 forceinline void i64To256(const byte *dst, int64_t val) {
@@ -396,6 +415,7 @@ forceinline void i64To256(const byte *dst, int64_t val) {
 	rp->fromInt(val);
 #endif
 }
+#endif
 
 }
 #endif
