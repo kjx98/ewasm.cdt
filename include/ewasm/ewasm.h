@@ -135,11 +135,10 @@ void DECL_IMPORT(getCaller, (address* acct));
 void DECL_IMPORT(getTxOrigin, (address* acct));
 void DECL_IMPORT(log, (void* dat, u32 dLen, u32 numTopics, bytes32* to1, bytes32* to2, bytes32* to3, bytes32* to4));
 void DECL_IMPORT(selfDestruct, (address* selfAddr));
-void DEBUG_IMPORT(print, (void*, u32));
-void DEBUG_IMPORT(printMem, (void*, u32));
-void DEBUG_IMPORT(printMemHex, (void*, u32));
+#ifndef	NDEBUG
 void DEBUG_IMPORT(printStorage, (bytes32 *));
 void DEBUG_IMPORT(printStorageHex, (bytes32 *));
+#endif
 #else
 void DECL_IMPORT(getAddress, (void* res));
 void DECL_IMPORT(getExternalBalance, (void* acct, u128 *bal));
@@ -149,11 +148,22 @@ void DECL_IMPORT(getCaller, (void* acct));
 void DECL_IMPORT(getTxOrigin, (void* acct));
 void DECL_IMPORT(log, (void* dat, u32 dLen, u32 numTopics, void* to1, void* to2, void* to3, void* to4));
 void DECL_IMPORT(selfDestruct, (void* selfAddr));
+#ifndef	NDEBUG
+void DEBUG_IMPORT(printStorage, (void *));
+void DEBUG_IMPORT(printStorageHex, (void *));
+#endif
+#endif
+
+#ifndef	NDEBUG
 void DEBUG_IMPORT(print, (void*, u32));
 void DEBUG_IMPORT(printMem, (void*, u32));
 void DEBUG_IMPORT(printMemHex, (void*, u32));
-void DEBUG_IMPORT(printStorage, (void *));
-void DEBUG_IMPORT(printStorageHex, (void *));
+#else
+#define	debug_print(x, y)	(void *)0
+#define	debug_printMem(x, y)	(void *)0
+#define	debug_printMemHex(x, y)	(void *)0
+#define	debug_printStorage(x)	(void *)0
+#define	debug_printStorageHex(x)	(void *)0
 #endif
 
 void DECL_IMPORT(useGas, (i64 gas));

@@ -10,14 +10,14 @@ which wasm-ld-9 && SUF="-9"
 if [ -d ../include/ewasm ]; then
 	INCD=../include
 	LIBPATH=../build/rt
-	OPTS="-O2"
+	OPTS="-D_DEBUG -O2"
 	#EXPO="--export=main --export-all"
 	#EXPO="--export=main --export=__heap_base"
 	EXPO="--export=main"
 else
 	INCD=${HOME}/opt/ewasm/include
 	LIBPATH=${HOME}/opt/ewasm/lib
-	OPTS="-O3"
+	OPTS="-DNDEBUG -O3"
 	#EXPO="--export=main --export=__heap_base"
 	EXPO="--export=main"
 fi
@@ -61,6 +61,7 @@ fi
 echo "wasm-ld export is ${EXPO}"
 #wasm-ld --no-entry --allow-undefined-file=${HOME}/opt/ewasm/ewasm.syms --export=main --strip-all ${OBJS} -L${LIBPATH} -lrt -o ${FILE}.wasm
 wasm-ld${SUF} --no-entry --allow-undefined-file=${HOME}/opt/ewasm/ewasm.syms ${EXPO} --strip-all ${OBJS} -L${LIBPATH} -lrt -o ${FILE}.wasm
+#clang${SUF} --target=wasm32 --no-standard-libraries -Wl,--no-entry -Wl,--allow-undefined-file=${HOME}/opt/ewasm/ewasm.syms -Wl,${EXPO} -Wl,--strip-all -L${LIBPATH} -lrt -o ${FILE}.wasm ${OBJS}
 rm -f ${OBJS}
 #wasm-dis /tmp/${FILE}.wasm | sed -s 's/Main/main/' > /tmp/${FILE}.wat
 #wasm-as /tmp/${FILE}.wat -o ${FILE}.wasm

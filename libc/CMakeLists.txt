@@ -1,10 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
 
-#set( CMAKE_C_COMPILER  ${COMPILER_PATH}${CROSS_COMPILE}clang )
-#set( CMAKE_CXX_COMPILER  ${COMPILER_PATH}${CROSS_COMPILE}clang++ )
-#set( CMAKE_AR  llvm-ar )
-#set( CMAKE_RANLIB  llvm-ranlib )
-
 enable_language(CXX)
 enable_language(C)
 
@@ -22,8 +17,6 @@ set( CMAKE_CXX_FLAGS " -Wall -O3 ${CMAKE_CXX_FLAGS} ${C_DEFINES}" )
 set ( libc_sources
    malloc.cpp
 )
-
-add_definitions( "--target=wasm32" )
 
 file ( GLOB libc_headers "${CMAKE_CURRENT_SOURCE_DIR}*.h" )
 list( APPEND libc_sources ${libc_headers} )

@@ -1,14 +1,25 @@
 cmake_minimum_required(VERSION 3.5)
 
-set( CMAKE_C_COMPILER  ${COMPILER_PATH}${CROSS_COMPILE}clang-9 )
-set( CMAKE_CXX_COMPILER  ${COMPILER_PATH}${CROSS_COMPILE}clang++-9 )
-set( CMAKE_AR  llvm-ar )
-set( CMAKE_RANLIB  llvm-ranlib )
+set( CMAKE_C_COMPILER  ${COMPILER_PATH}${CROSS_COMPILE}clang$ENV{SUF} )
+set( CMAKE_CXX_COMPILER  ${COMPILER_PATH}${CROSS_COMPILE}clang++$ENV{SUF} )
+set( CMAKE_AR  llvm-ar$ENV{SUF} )
+set( CMAKE_RANLIB  llvm-ranlib$ENV{SUF} )
 
 # CMAKE_INSTALL_PREFIX set install prefix
 
+set(CMAKE_BUILD_TYPE "Release")
+#set(CMAKE_BUILD_TYPE "Debug")
+
 project(cdt)
 
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+		add_definitions( "-D_DEBUG")
+else()
+		add_definitions( "-DNDEBUG")
+endif()
+
+add_definitions( "--no-standard-libraries -Wpedantic")
+add_definitions( "--target=wasm32" )
 #add_definitions( "-DUSE_MALLOC_ABI")
 
 install(DIRECTORY include 

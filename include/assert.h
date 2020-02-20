@@ -20,6 +20,7 @@
 extern "C" {
 #endif
 
+#pragma clang diagnostic ignored "-Wc11-extensions"
 _Noreturn void __assert_fail (const char *, const char *, int, const char *);
 
 #ifdef __cplusplus
