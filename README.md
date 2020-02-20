@@ -17,6 +17,10 @@ https://travis-ci.org/kjx98/ewasm.cdt)
 * ewasm CDT installed under ~/opt/ewasm
 * ~/bin/bldewasm.sh is sample compile and link script for C/C++
 
+### tested OS
+*	fedora 31+
+*	ubuntu 18.04+
+
 ### rt library
 * only support integer (NO float yet!)
 * only memcpy/memset/memcmp/strlen builtins

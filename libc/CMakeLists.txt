@@ -3,6 +3,12 @@ cmake_minimum_required(VERSION 3.5)
 enable_language(CXX)
 enable_language(C)
 
+set( CMAKE_AR  llvm-ar$ENV{SUF} )
+set( CMAKE_RANLIB  llvm-ranlib$ENV{SUF} )
+
+message(STATUS "libc use ${CMAKE_AR} for ar")
+message(STATUS "libc use ${CMAKE_RANLIB} for ranlib")
+
 project(libc)
 find_program(CCACHE_FOUND ccache)
 if (CCACHE_FOUND)

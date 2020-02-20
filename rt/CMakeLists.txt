@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.5)
 
-#set( CMAKE_C_COMPILER  ${COMPILER_PATH}${CROSS_COMPILE}clang )
-#set( CMAKE_CXX_COMPILER  ${COMPILER_PATH}${CROSS_COMPILE}clang++ )
-#set( CMAKE_AR  llvm-ar )
-#set( CMAKE_RANLIB  llvm-ranlib )
-
 enable_language(CXX)
 enable_language(C)
+
+set( CMAKE_AR  llvm-ar$ENV{SUF} )
+set( CMAKE_RANLIB  llvm-ranlib$ENV{SUF} )
+message(STATUS "rt use ${CMAKE_AR} for ar")
+message(STATUS "rt use ${CMAKE_RANLIB} for ranlib")
 
 project(librt)
 find_program(CCACHE_FOUND ccache)

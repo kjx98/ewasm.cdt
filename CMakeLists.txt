@@ -5,6 +5,9 @@ set( CMAKE_CXX_COMPILER  ${COMPILER_PATH}${CROSS_COMPILE}clang++$ENV{SUF} )
 set( CMAKE_AR  llvm-ar$ENV{SUF} )
 set( CMAKE_RANLIB  llvm-ranlib$ENV{SUF} )
 
+#message(STATUS "use ${CMAKE_AR} for ar")
+#message(STATUS "use ${CMAKE_RANLIB} for ranlib")
+
 # CMAKE_INSTALL_PREFIX set install prefix
 
 set(CMAKE_BUILD_TYPE "Release")
