@@ -1,4 +1,4 @@
-#include <ewasm/ewasm.hpp>
+#include <ewasm/ewasm.h>
 #include "abi.h"
 #include "ewasm_main.h"
 
@@ -9,9 +9,9 @@ byte	__abiBuff[MAX_ABI_INPUT];
 #endif
 static	byte	ret[32]={0,0,0,0, 0,0,0,10};
 
-//#pragma clang diagnostic ignored "-Wmain-return-type"
+#pragma clang diagnostic ignored "-Wmain-return-type"
 // __attribute__((export_name("main")))
-int main()
+void main()
 {
 	u32	in_len;
 	// constructor with null input while no arguments
@@ -66,5 +66,5 @@ int main()
 	ewasm_print("after call ewasm_main");
 	// we should encode result and eth_finish
 	returnResult(mtdPtr->outputs, mtdPtr->nResults);
-	return 0;
+	//return 0;
 }

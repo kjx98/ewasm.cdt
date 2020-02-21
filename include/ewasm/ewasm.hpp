@@ -480,13 +480,6 @@ struct	method : ewasm_method {
 	{}
 };
 
-
-struct ewasm_ABI
-{
-	uint32_t		nMethods;	// >0, at least constructor
-	const ewasm_method	*methods;	// the first method MUST BE constructor
-};
-
 struct	ABI : ewasm_ABI {
 	constexpr ABI(ewasm_ABI init = {}) : ewasm_ABI{init} {}
 	template <size_t N>
@@ -499,9 +492,5 @@ struct	ABI : ewasm_ABI {
 	{}
 };
 
-extern	ABI	__Contract_ABI;
 }
-
-void ewasm_main(const u32 Id, const ewasm_method *);
-
 #endif

@@ -216,13 +216,19 @@ void forceinline exit(int i){ __builtin_unreachable(); }
 ///////////////////////////////////////////////////
 // ethereum ABI									 //
 ///////////////////////////////////////////////////
-// ethereum ABI only for C++
+// ethereum ABI not only for C++
+#ifdef	NDEBUG
+#define	ewasm_print(x)	(void *)0
+#else
 #ifdef	__cplusplus
-
 template <size_t N>
 forceinline void ewasm_print(const char (&s)[N]) {
 	debug_print((void *)s, N);
 }
+#else
+#define	ewasm_print(x)	debug_print(x, strlen(x))
+#endif
+#endif
 
 enum	ewasm_argType {
 	UINT16	= 0,
@@ -241,14 +247,14 @@ enum	ewasm_argType {
 	BYTES	= 13,
 };
 
-struct ewasm_argument
+typedef	struct ewasm_argument
 {
 	i32		_type;
 	ewasm_bytes	pValue;	// for int/uint 128, 256 and bytes
 	u64		_nValue;
-};
+}	ewasm_argument;
 
-struct ewasm_method
+typedef	struct ewasm_method
 {
 	char	*Name;	// name of method
 	u32		Id;		// uint32be ID of method, 0 for Constructor
@@ -256,9 +262,22 @@ struct ewasm_method
 	int		nResults;
 	ewasm_argument	*inputs;
 	ewasm_argument	*outputs;
-};
-#endif
+}	ewasm_method;
 
+typedef	struct ewasm_ABI
+{
+	uint32_t		nMethods;	// >0, at least constructor
+	const ewasm_method	*methods;	// the first method MUST BE constructor
+}	ewasm_ABI;
+
+#ifdef	__cplusplus
+extern "C" {            /* Assume C declarations for C++ */
+#endif
+extern	ewasm_ABI	__Contract_ABI;
+void ewasm_main(const u32 Id, const ewasm_method *);
+#ifdef	__cplusplus
+}
+#endif
 
 ///////////
 // Other //

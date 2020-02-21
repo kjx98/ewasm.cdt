@@ -15,10 +15,14 @@ ewasm::method	_methods[]={
 };
 
 namespace ewasm {
-ABI __Contract_ABI{_methods};
+static ABI myABI={_methods};
 }
 
 using namespace	ewasm;
+
+extern "C" {
+ewasm_ABI __Contract_ABI=myABI;
+}
 
 static	byte	ret[32]={0,0,0,0, 0,0,0,10};
 static	bytes32	key0(1), val32;

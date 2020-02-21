@@ -31,7 +31,7 @@ set ( builtins_sources
 	memcmp.c
 	memrcpy.c
 	strlen.c
-	ewasm_main.cpp
+	ewasm_main.c
 	abi.cpp
 	abi_ret.cpp
 	abi.h

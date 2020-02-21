@@ -8,6 +8,7 @@
 //__attribute__((uninitialized))
 #define	paramBuff	__abiBuff
 
+extern "C"
 int decodeParam(ewasm_argument *args, int argc, u32 in_len)
 {
 	u32	paramOff=0;
