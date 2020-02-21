@@ -9,7 +9,7 @@
 #define	resBuff	__abiBuff
 
 extern "C"
-__attribute__((noreturn)) void returnResult(ewasm_argument *args, int nRet)
+__attribute__((noreturn)) void returnResult(ewasm_argument *args, u32 nRet)
 {
 	if (nRet == 0) eth_finish(nullptr, 0);
 	//assert(args != nullptr);

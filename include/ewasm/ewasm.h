@@ -102,7 +102,7 @@ typedef struct ewasm_address
 typedef struct ewasm_bytes
 {
 	void	*_data;
-	uint32_t	_size;
+	u32		_size;
 } ewasm_bytes;
 
 // builtin and host interface function as C declarations
@@ -258,15 +258,15 @@ typedef	struct ewasm_method
 {
 	char	*Name;	// name of method
 	u32		Id;		// uint32be ID of method, 0 for Constructor
-	int		nParams;
-	int		nResults;
+	u32		nParams;
+	u32		nResults;
 	ewasm_argument	*inputs;
 	ewasm_argument	*outputs;
 }	ewasm_method;
 
 typedef	struct ewasm_ABI
 {
-	uint32_t		nMethods;	// >0, at least constructor
+	u32					nMethods;	// >0, at least constructor
 	const ewasm_method	*methods;	// the first method MUST BE constructor
 }	ewasm_ABI;
 

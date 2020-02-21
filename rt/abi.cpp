@@ -9,7 +9,7 @@
 #define	paramBuff	__abiBuff
 
 extern "C"
-int decodeParam(ewasm_argument *args, int argc, u32 in_len)
+int decodeParam(ewasm_argument *args, u32 argc, u32 in_len)
 {
 	u32	paramOff=0;
 	if (argc == 0) return 0;

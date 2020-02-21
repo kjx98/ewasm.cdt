@@ -118,7 +118,7 @@ struct	bytes32 : ewasm_bytes32
 	{
 		static_assert(sizeof(bytes32) == 32, "size of bytes32 MUST be 32");
 	}
-	void from128u(const uint128_t *u128p) noexcept {
+	void from128u(const u128 *u128p) noexcept {
 		memset(bytes, 0, 16);
 		memrcpy(bytes+16, (void *)u128p, 16);
 	}
@@ -203,9 +203,9 @@ using uint256be = bytes32;
 constexpr inline uint64_t load64be(const uint8_t* bytes) noexcept
 {
 #ifdef	ommit
-    return (uint64_t{bytes[0]} << 56) | (uint64_t{bytes[1]} << 48) | (uint64_t{bytes[2]} << 40) |
-           (uint64_t{bytes[3]} << 32) | (uint64_t{bytes[4]} << 24) | (uint64_t{bytes[5]} << 16) |
-           (uint64_t{bytes[6]} << 8) | uint64_t{bytes[7]};
+    return (u64{bytes[0]} << 56) | (u64{bytes[1]} << 48) | (u64{bytes[2]} << 40) |
+           (u64{bytes[3]} << 32) | (u64{bytes[4]} << 24) | (u64{bytes[5]} << 16) |
+           (u64{bytes[6]} << 8) | u64{bytes[7]};
 #else
 	return __builtin_bswap64(*(uint64_t *)bytes);
 #endif
@@ -215,8 +215,7 @@ constexpr inline uint64_t load64be(const uint8_t* bytes) noexcept
 constexpr inline uint32_t load32be(const uint8_t* bytes) noexcept
 {
 #ifdef	ommit
-    return (uint32_t{bytes[0]} << 24) | (uint32_t{bytes[1]} << 16) | (uint32_t{bytes[2]} << 8) |
-           uint32_t{bytes[3]};
+    return (u32{bytes[0]} << 24) | (u32{bytes[1]} << 16) | (u32{bytes[2]} << 8) | u32{bytes[3]};
 #else
 	return __builtin_bswap32(*(uint32_t *)bytes);
 #endif
