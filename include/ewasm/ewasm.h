@@ -51,42 +51,69 @@ typedef uint8_t		byte;
 #define forceinline __inline__
 #endif
 
+
 //////////////////////////
 // Types For Wasm Stuff //
 //////////////////////////
 
+#ifdef	__cplusplus
+using i32 = int32_t;
+using i64 = int64_t;
+using u32 = uint32_t;
+using u64 = uint64_t;
+using u16 = uint16_t;
+using u128 = uint128_t;
+#else
 typedef int32_t i32; // same as i32 in WebAssembly
 typedef int64_t i64; // same as i64 in WebAssembly
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef unsigned __int128 u128; // a 128 bit number, represented as a 16 bytes long little endian unsigned integer in memory, not sure if this works
+//typedef uint256_t u256; // a 256 bit number, represented as a 32 bytes long little endian unsigned integer in memory, doesn't work
+typedef uint32_t i32ptr; // same as i32 in WebAssembly, but treated as a pointer to a WebAssembly memory offset
+#endif
+
+// bswap32, bswap64 already builtin
+forceinline uint128_t bswap128(uint128_t ml) {
+	uint128_t ret;
+	u64	*ss=(u64 *)&ml;
+	u64	*dp=(u64 *)&ret;
+	dp[0] = __builtin_bswap64(ss[1]);
+	dp[1] = __builtin_bswap64(ss[0]);
+	return ret;
+}
 
 
 //////////////////////////////
 // Types for Ethereum Stuff //
 //////////////////////////////
 
-//typedef uint8_t* bytes; // an array of bytes with unrestricted length
-//typedef uint8_t bytes32[32]; // an array of 32 bytes
+// an array of 32 bytes
 typedef struct	ewasm_bytes32
 {
 	uint8_t	bytes[32];
 } ewasm_bytes32;
-typedef struct ewasm_bytes32	ewasm_uint256be;
+
 typedef struct ewasm_address
 {
 	uint8_t bytes[20]; // an array of 20 bytes
 } ewasm_address;
+
 typedef struct ewasm_bytes
 {
 	void	*_data;
 	uint32_t	_size;
 } ewasm_bytes;
-typedef uint32_t u32;
-typedef uint64_t u64;
-typedef unsigned __int128 u128; // a 128 bit number, represented as a 16 bytes long little endian unsigned integer in memory, not sure if this works
-//typedef uint256_t u256; // a 256 bit number, represented as a 32 bytes long little endian unsigned integer in memory, doesn't work
-typedef uint32_t i32ptr; // same as i32 in WebAssembly, but treated as a pointer to a WebAssembly memory offset
 
 // builtin and host interface function as C declarations
 #ifdef	__cplusplus
+namespace	ewasm {
+struct	address;
+struct	bytes32;
+};
+
+using	namespace ewasm;
+
 extern "C" {            /* Assume C declarations for C++ */
 #endif
 // define for memory op, no string.h with clang wasm32 target
@@ -102,31 +129,17 @@ void *calloc(size_t count, size_t size);
 void free(void *);
 void *realloc(void *, size_t);
 
-// bswap32, bswap64 already builtin
-forceinline uint128_t bswap128(uint128_t ml) {
-	uint128_t ret;
-	u64	*ss=(u64 *)&ml;
-	u64	*dp=(u64 *)&ret;
-	dp[0] = __builtin_bswap64(ss[1]);
-	dp[1] = __builtin_bswap64(ss[0]);
-	return ret;
-}
 
-// ethereum interface functions
 ////////////////////////////
 // EEI Method Declaration //
 ////////////////////////////
+// ethereum interface functions
 #define DECL_IMPORT(name, args) eth_##name args \
     __attribute__((import_module("ethereum"),import_name( #name )))
 #define DEBUG_IMPORT(name, args) debug_##name args \
     __attribute__((import_module("debug"),import_name( #name )))
 
 #ifdef	__cplusplus
-namespace	ewasm {
-struct	address;
-struct	bytes32;
-};
-using	namespace ewasm;
 void DECL_IMPORT(getAddress, (address* res));
 void DECL_IMPORT(getExternalBalance, (address* acct, u128 *bal));
 void DECL_IMPORT(storageStore, (bytes32* key, bytes32* value));
@@ -183,15 +196,16 @@ u64 DECL_IMPORT(getBlockTimestamp, () );
 void DECL_IMPORT(finish, (void* _off, u32 _len));
 void DECL_IMPORT(revert, (void* _off, u32 _len));
 
-#define	ewasm_print(x) debug_print(x, strlen(x))
+#define	ewasm_print(x) debug_print(x, sizeof(x))
+
 
 ///////////////////////////////////////////////////
 // Useful Intrinsics, Not Including Memory Stuff //
 ///////////////////////////////////////////////////
 
-extern void __builtin_unreachable();			// wasm unreachable opcode
-extern int __builtin_ctz(unsigned int); 		// wasm i32.ctz opcode
-extern int __builtin_ctzll(unsigned long long); 	// wasm i64.ctz opcode
+void __builtin_unreachable();			// wasm unreachable opcode
+int __builtin_ctz(unsigned int); 		// wasm i32.ctz opcode
+int __builtin_ctzll(unsigned long long); 	// wasm i64.ctz opcode
 // there are many more like this
 
 void forceinline exit(int i){ __builtin_unreachable(); }
@@ -200,7 +214,12 @@ void forceinline exit(int i){ __builtin_unreachable(); }
 }
 #endif
 
-// ethereum ABI
+
+///////////////////////////////////////////////////
+// ethereum ABI									 //
+///////////////////////////////////////////////////
+// ethereum ABI only for C++
+#ifdef	__cplusplus
 enum	ewasm_argType {
 	UINT16	= 0,
 	UINT32	= 1,
@@ -218,14 +237,14 @@ enum	ewasm_argType {
 	BYTES	= 13,
 };
 
-typedef struct ewasm_argument
+struct ewasm_argument
 {
 	i32		_type;
 	ewasm_bytes	pValue;	// for int/uint 128, 256 and bytes
 	u64		_nValue;
-}	ewasm_argument;
+};
 
-typedef struct ewasm_method
+struct ewasm_method
 {
 	char	*Name;	// name of method
 	u32		Id;		// uint32be ID of method, 0 for Constructor
@@ -233,15 +252,16 @@ typedef struct ewasm_method
 	int		nResults;
 	ewasm_argument	*inputs;
 	ewasm_argument	*outputs;
-}	ewasm_method;
+};
 
-typedef struct ewasm_ABI
+struct ewasm_ABI
 {
 	uint32_t		nMethods;	// >0, at least constructor
 	const ewasm_method	*methods;	// the first method MUST BE constructor
-}	ewasm_ABI;
+};
 
-#define	DECL_ABI(x) { sizeof(x)/sizeof(x[0]), x }
+//#define	DECL_ABI(x) { sizeof(x)/sizeof(x[0]), x }
+#endif
 
 
 ///////////
@@ -251,8 +271,8 @@ typedef struct ewasm_ABI
 /*
 Below are some things which you can use to give LLVM hints to do certain things.
 
-__attribute__((import_module("ethereum")))	- work after llvm 8
-__attribute__((import_name("funcname")))	- work after llvm 8
+__attribute__((import_module("ethereum")))	- work with llvm 8+
+__attribute__((import_name("funcname")))	- work with llvm 8+
 __attribute__((visibility("default"))) 		- make function exported
 __attribute__((visibility("hidden")))		- make thing not exported
 __attribute__((visibility("used")))		- make variable const global and exported

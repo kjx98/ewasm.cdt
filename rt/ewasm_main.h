@@ -8,16 +8,8 @@
 #define	MAX_ABI_INPUT	512
 #endif
 
-#ifdef	_cplusplus
-extern "C" {
-#endif
-
 #ifdef	USE_MALLOC_ABI
 extern	byte	*__abiBuff;
 #else
 extern	byte	__abiBuff[];
-#endif
-
-#ifdef	_cplusplus
-}
 #endif

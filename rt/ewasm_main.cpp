@@ -10,8 +10,8 @@ byte	__abiBuff[MAX_ABI_INPUT];
 static	byte	ret[32]={0,0,0,0, 0,0,0,10};
 
 //#pragma clang diagnostic ignored "-Wmain-return-type"
-__attribute__((weak))
-int main() // __attribute__((export_name("main")))
+// __attribute__((export_name("main")))
+int main()
 {
 	u32	in_len;
 	// constructor with null input while no arguments
