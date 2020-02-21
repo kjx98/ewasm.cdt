@@ -1,4 +1,4 @@
-#include <ewasm/ewasm.h>
+#include <ewasm/ewasm.hpp>
 #include "abi.h"
 #include "ewasm_main.h"
 
@@ -9,9 +9,9 @@ byte	__abiBuff[MAX_ABI_INPUT];
 #endif
 static	byte	ret[32]={0,0,0,0, 0,0,0,10};
 
-#pragma clang diagnostic ignored "-Wmain-return-type"
+//#pragma clang diagnostic ignored "-Wmain-return-type"
 __attribute__((weak))
-void main() // __attribute__((export_name("main")))
+int main() // __attribute__((export_name("main")))
 {
 	u32	in_len;
 	// constructor with null input while no arguments
@@ -21,7 +21,7 @@ void main() // __attribute__((export_name("main")))
 	__abiBuff = malloc(MAX_ABI_INPUT);
 	assert(__abiBuff != nullptr);
 #endif
-	ewasm_method*	mtdPtr = __Contract_ABI.methods;
+	const ewasm_method*	mtdPtr = __Contract_ABI.methods;
 	if ( ((in_len=eth_getCallDataSize())  & 0x1f) == 0 ) {
 		// Constructor
 		if (__Contract_ABI.nMethods == 0) {

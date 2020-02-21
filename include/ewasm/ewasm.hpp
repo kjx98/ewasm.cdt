@@ -358,8 +358,8 @@ constexpr inline bytes::operator bool() const noexcept {
 	return this->_size != 0 && this->_data != nullptr;
 }
 
-inline bytes operator""_bytes (const char* s) noexcept{
-	return bytes(ewasm_bytes{(void *)s, strlen(s)});
+inline bytes operator""_bytes (const char* s, const size_t sLen) noexcept{
+	return bytes(ewasm_bytes{(void *)s, sLen});
 }
 
 forceinline uint128_t u128From256(const byte *src) {
@@ -479,6 +479,22 @@ struct	method : ewasm_method {
 	{}
 #endif
 };
+
+struct	ABI : ewasm_ABI {
+	constexpr ABI(ewasm_ABI init = {}) : ewasm_ABI{init} {}
+	template <size_t N>
+	constexpr ABI(const ewasm_method (&s)[N]) : ewasm_ABI{
+			N, &s[0]}
+	{}
+	template <size_t N>
+	constexpr ABI(const method (&s)[N]) : ewasm_ABI{{
+			N, &s[0]}}
+	{}
+};
+
+extern	ABI	__Contract_ABI;
+extern	__attribute__((weak))
+void ewasm_main(const u32 Id, const ewasm_method *);
 
 }
 #endif

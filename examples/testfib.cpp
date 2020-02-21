@@ -13,7 +13,9 @@ ewasm_method	_methods[]={
 	{(char *)"owner", 0x8da5cb5b, 0, 0,},
 };
 
-extern "C" ewasm_ABI __Contract_ABI={3, _methods};
+namespace ewasm {
+ABI __Contract_ABI{_methods};
+}
 
 using namespace	ewasm;
 

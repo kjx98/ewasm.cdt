@@ -1,6 +1,6 @@
-#include <ewasm/ewasm.hpp>
+#include <ewasm/ewasm.h>
 
-__attribute__ ((noinline)) extern "C"
+__attribute__ ((noinline))
 void* memcpy(void* __restrict destination, const void* __restrict source, size_t len) {
   uint8_t* destination_ptr = (uint8_t*) destination;
   uint8_t* source_ptr = (uint8_t*) source;
@@ -17,7 +17,7 @@ void* memcpy(void* __restrict destination, const void* __restrict source, size_t
   return destination;
 }
 
-__attribute__ ((noinline)) extern "C"
+__attribute__ ((noinline))
 void* memset(void* __restrict in, int c, size_t len) {
   uint8_t* in_ptr = (uint8_t*)in;
   if (len>8){

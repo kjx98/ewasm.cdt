@@ -1,6 +1,6 @@
-#include <ewasm/ewasm.hpp>
+#include <ewasm/ewasm.h>
 
-__attribute__ ((noinline)) extern "C"
+__attribute__ ((noinline))
 void* memrcpy(void* __restrict destination, const void* __restrict source, size_t len) {
   uint8_t* destination_ptr = (uint8_t*) destination;
   uint8_t* source_ptr = (uint8_t*) source +(len-1);

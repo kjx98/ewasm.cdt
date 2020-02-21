@@ -238,25 +238,10 @@ typedef struct ewasm_method
 typedef struct ewasm_ABI
 {
 	uint32_t		nMethods;	// >0, at least constructor
-	ewasm_method	*methods;	// the first method MUST BE constructor
+	const ewasm_method	*methods;	// the first method MUST BE constructor
 }	ewasm_ABI;
 
 #define	DECL_ABI(x) { sizeof(x)/sizeof(x[0]), x }
-
-// ethereum ABI
-#ifdef	__cplusplus
-extern "C" {            /* Assume C declarations for C++ */
-#endif
-//extern u32 getCallMethodID();
-//extern int decodeParam(ewasm_argument *, int);
-extern	ewasm_ABI	__Contract_ABI;
-extern	__attribute__((weak))
-void ewasm_main(const u32 Id, const ewasm_method *);
-extern int encodeResult(ewasm_argument *, const int);
-
-#ifdef	__cplusplus
-}
-#endif
 
 
 ///////////

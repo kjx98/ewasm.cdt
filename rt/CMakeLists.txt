@@ -27,11 +27,11 @@ set ( builtins_sources
 	lshti3.cpp
 	modti3.cpp
 	multi3.cpp
-	memops.cpp
-	memcmp.cpp
-	memrcpy.cpp
-	strlen.cpp
-	ewasm_main.c
+	memops.c
+	memcmp.c
+	memrcpy.c
+	strlen.c
+	ewasm_main.cpp
 	abi.cpp
 	abi_ret.cpp
 	abi.h
