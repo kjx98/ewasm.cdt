@@ -22,6 +22,7 @@
 #define __EWASM_HPP__
 
 #include <ewasm/ewasm.h>
+typedef	decltype(nullptr)	nullptr_t;
 
 // EWASM C++ API - wrappers and bindings for C++
 // @ingroup cpp
@@ -71,7 +72,7 @@ struct	address:	ewasm_address
 /// The fixed size array of 32 bytes for storing 256-bit EVM values.
 ///
 /// This type wraps C ::ewasm_bytes32 to make sure objects of this type are always initialized.
-struct bytes32 : ewasm_bytes32
+struct	bytes32 : ewasm_bytes32
 {
 	/// Default and converting constructor.
 	///
@@ -456,28 +457,27 @@ struct	method : ewasm_method {
 	template <size_t nLen, size_t iLen, size_t oLen>
 	constexpr method(const char(&s)[nLen], const u32 id,
 					const ewasm_argument (&ins)[iLen],
-					const ewasm_argument (&outs)[oLen]) : ewasm_method {{
+					const ewasm_argument (&outs)[oLen]) : ewasm_method {
 			(char *)s, id,
-			iLen, oLen, &ins[0], &outs[0]}}
+			iLen, oLen, (ewasm_argument *)&ins[0], (ewasm_argument *)&outs[0]}
 	{}
 	template <size_t nLen, size_t iLen>
 	constexpr method(const char(&s)[nLen], const u32 id,
-					const ewasm_argument (&ins)[iLen]) : ewasm_method {{
+					const ewasm_argument (&ins)[iLen]) : ewasm_method {
 			(char *)s, id,
-			iLen, 0, &ins[0]}}
-	{}
-#ifdef	ommmit
-	template <size_t nLen, size_t oLen>
-	constexpr method(const char(&s)[nLen], const u32 id, nullptr_t nullptr,
-					const ewasm_argument (&outs)[oLen]) : ewasm_method {{
-			(char *)s, id,
-			0, oLen, nullptr, &outs[0]}}
+			iLen, 0, (ewasm_argument *)&ins[0]}
 	{}
 	template <size_t N>
-	constexpr method(const char(&s)[N], const u32 id) : ewasm_method {{
-			(char *)s, id, 0, 0, nullptr, nullptr}}
+	constexpr method(const char(&s)[N], const u32 id) : ewasm_method {
+			(char *)s, id, 0, 0, nullptr, nullptr}
 	{}
-#endif
+	// ignore inputs, as nIn == 0
+	template <size_t nLen, size_t oLen>
+	constexpr method(const char(&s)[nLen], const u32 id, const int nIn,
+					const ewasm_argument (&outs)[oLen]) : ewasm_method {
+			(char *)s, id,
+			0, oLen, nullptr, (ewasm_argument *)&outs[0]}
+	{}
 };
 
 struct	ABI : ewasm_ABI {
@@ -487,8 +487,8 @@ struct	ABI : ewasm_ABI {
 			N, &s[0]}
 	{}
 	template <size_t N>
-	constexpr ABI(const method (&s)[N]) : ewasm_ABI{{
-			N, &s[0]}}
+	constexpr ABI(const method (&s)[N]) : ewasm_ABI{
+			N, &s[0]}
 	{}
 };
 

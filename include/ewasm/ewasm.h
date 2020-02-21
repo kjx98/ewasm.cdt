@@ -259,8 +259,6 @@ struct ewasm_ABI
 	uint32_t		nMethods;	// >0, at least constructor
 	const ewasm_method	*methods;	// the first method MUST BE constructor
 };
-
-//#define	DECL_ABI(x) { sizeof(x)/sizeof(x[0]), x }
 #endif
 
 
