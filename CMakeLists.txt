@@ -10,8 +10,8 @@ set( CMAKE_RANLIB  llvm-ranlib$ENV{SUF} )
 
 # CMAKE_INSTALL_PREFIX set install prefix
 
-set(CMAKE_BUILD_TYPE "Release")
-#set(CMAKE_BUILD_TYPE "Debug")
+#set(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_BUILD_TYPE "Debug")
 
 project(cdt)
 
@@ -21,7 +21,7 @@ else()
 		add_definitions( "-DNDEBUG")
 endif()
 
-add_definitions( "--no-standard-libraries -Wpedantic")
+add_definitions( "--no-standard-libraries -fno-exceptions -Wpedantic")
 add_definitions( "--target=wasm32" )
 #add_definitions( "-DUSE_MALLOC_ABI")
 

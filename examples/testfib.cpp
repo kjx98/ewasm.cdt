@@ -22,10 +22,11 @@ using namespace	ewasm;
 
 static	byte	ret[32]={0,0,0,0, 0,0,0,10};
 static	bytes32	key0(1), val32;
-extern "C" void ewasm_main(const u32 Id, const ewasm_method *mtdPtr)
+void ewasm_main(const u32 Id, const ewasm_method *mtdPtr)
 {
 	//static_assert(sizeof(nullArg) == 0, "size of empty arguments MUST be 0");
 	u32 n = 10;
+	debug_printMemHex((void *)&Id, sizeof(Id));
 	switch (Id) {
 	case 0x73181a7b:
 		n = arg1[0]._nValue;

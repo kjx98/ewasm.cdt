@@ -196,8 +196,6 @@ u64 DECL_IMPORT(getBlockTimestamp, () );
 void DECL_IMPORT(finish, (void* _off, u32 _len));
 void DECL_IMPORT(revert, (void* _off, u32 _len));
 
-#define	ewasm_print(x) debug_print(x, sizeof(x))
-
 
 ///////////////////////////////////////////////////
 // Useful Intrinsics, Not Including Memory Stuff //
@@ -220,6 +218,12 @@ void forceinline exit(int i){ __builtin_unreachable(); }
 ///////////////////////////////////////////////////
 // ethereum ABI only for C++
 #ifdef	__cplusplus
+
+template <size_t N>
+forceinline void ewasm_print(const char (&s)[N]) {
+	debug_print((void *)s, N);
+}
+
 enum	ewasm_argType {
 	UINT16	= 0,
 	UINT32	= 1,
@@ -252,12 +256,6 @@ struct ewasm_method
 	int		nResults;
 	ewasm_argument	*inputs;
 	ewasm_argument	*outputs;
-};
-
-struct ewasm_ABI
-{
-	uint32_t		nMethods;	// >0, at least constructor
-	const ewasm_method	*methods;	// the first method MUST BE constructor
 };
 #endif
 

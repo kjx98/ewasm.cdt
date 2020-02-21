@@ -61,7 +61,10 @@ int main()
 		eth_revert(0, 0);
 		// invalid, not enough params
 	}
+	ewasm_print("before call ewasm_main");
 	ewasm_main(mtdPtr->Id, mtdPtr);
+	ewasm_print("after call ewasm_main");
 	// we should encode result and eth_finish
 	returnResult(mtdPtr->outputs, mtdPtr->nResults);
+	return 0;
 }
