@@ -10,8 +10,8 @@ set( CMAKE_RANLIB  llvm-ranlib$ENV{SUF} )
 
 # CMAKE_INSTALL_PREFIX set install prefix
 
-#set(CMAKE_BUILD_TYPE "Release")
-set(CMAKE_BUILD_TYPE "Debug")
+set(CMAKE_BUILD_TYPE "Release")
+#set(CMAKE_BUILD_TYPE "Debug")
 
 project(cdt)
 

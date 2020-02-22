@@ -30,8 +30,6 @@ using namespace	ewasm;
 
 extern "C" {
 ewasm_ABI __Contract_ABI{myABI.nMethods, myABI.methods};
-// assign C struct from C++ struct does not work
-//ewasm_ABI __Contract_ABI=myABI;
 }
 
 static	byte	ret[32]={0,0,0,0, 0,0,0,10};
@@ -40,7 +38,6 @@ void ewasm_main(const u32 Id, const ewasm_method *mtdPtr)
 {
 	static_assert(sizeof(method) == sizeof(ewasm_method), "size of ewasm_method and method MUST equal");
 	static_assert(sizeof(ABI) == sizeof(ewasm_ABI), "size of ewasm_ABI and ABI MUST equal");
-	//static_assert(sizeof(nullArg) == 0, "size of empty arguments MUST be 0");
 	u32 n = 10;
 	debug_printMemHex((void *)&Id, sizeof(Id));
 	switch (Id) {

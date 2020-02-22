@@ -95,6 +95,7 @@ struct	bytes32 : ewasm_bytes32
 		0,
 		0,
 		0,
+		0,
 		addr.bytes[0],
 		addr.bytes[1],
 		addr.bytes[2],
@@ -451,6 +452,7 @@ forceinline void i64To256(const byte *dst, int64_t val) {
 #endif
 }
 
+// not work yet with ewasm_main.c
 struct	method : ewasm_method {
 	constexpr method(ewasm_method init = {}) : ewasm_method{init} {}
 	template <size_t nLen, size_t iLen, size_t oLen>

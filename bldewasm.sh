@@ -11,9 +11,10 @@ if [ -d ../include/ewasm ]; then
 	INCD=../include
 	LIBPATH=../build/rt
 	OPTS="-D_DEBUG -O2"
-	EXPO="--export=main --export-all"
+	#OPTS="-DNDEBUG -O2"
+	#EXPO="--export=main --export-all"
 	#EXPO="--export=main --export=__heap_base"
-	#EXPO="--export=main"
+	EXPO="--export=main"
 else
 	INCD=${HOME}/opt/ewasm/include
 	LIBPATH=${HOME}/opt/ewasm/lib
