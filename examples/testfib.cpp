@@ -2,7 +2,7 @@
 
 static u32 fib(u32 n) {
 	if (n < 2) return n;
-	u32	result;
+	u32	result = 2;
 	u32	pre = 1;
 	u32 next = 1;
 	for (u32 i = 2; i < n; ++i) {
