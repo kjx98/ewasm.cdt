@@ -22,13 +22,15 @@ https://travis-ci.org/kjx98/ewasm.cdt)
 *	ubuntu 18.04+
 
 ### rt library
+* support __int128, multiply/divide/mod/shift etc
 * only support integer (NO float yet!)
-* only memcpy/memset/memcmp/strlen builtins
+* only malloc/memcpy/memset/memcmp/strlen builtins
 
 ### libc library
-Work in progress
-C/C++ no use functions from standard library shoud work
-*TODO string/exit of libc
+* Work In Progress
+*	bldewasm.sh is a sample compile/link script
+*	C/C++ without standard library shoud work, C++ template and clang builtins should work
+* TODO string/exit of libc
 
 ## Examples
 *	testfib.cpp  example C++ smart contract calc fibonacci number
