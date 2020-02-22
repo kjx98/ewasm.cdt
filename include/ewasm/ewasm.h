@@ -286,8 +286,8 @@ void ewasm_main(const u32 Id, const ewasm_method *);
 /*
 Below are some things which you can use to give LLVM hints to do certain things.
 
-__attribute__((import_module("ethereum")))	- work with llvm 8+
-__attribute__((import_name("funcname")))	- work with llvm 8+
+__attribute__((import_module("ethereum")))	- work with clang/llvm 8+
+__attribute__((import_name("funcname")))	- work with clang/llvm 8+
 __attribute__((visibility("default"))) 		- make function exported
 __attribute__((visibility("hidden")))		- make thing not exported
 __attribute__((visibility("used")))		- make variable const global and exported

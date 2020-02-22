@@ -203,23 +203,13 @@ using uint256be = bytes32;
 /// Loads 64 bits / 8 bytes of data from the given @p bytes array in big-endian order.
 constexpr inline uint64_t load64be(const uint8_t* bytes) noexcept
 {
-#ifdef	ommit
-    return (u64{bytes[0]} << 56) | (u64{bytes[1]} << 48) | (u64{bytes[2]} << 40) |
-           (u64{bytes[3]} << 32) | (u64{bytes[4]} << 24) | (u64{bytes[5]} << 16) |
-           (u64{bytes[6]} << 8) | u64{bytes[7]};
-#else
 	return __builtin_bswap64(*(uint64_t *)bytes);
-#endif
 }
 
 /// Loads 32 bits / 4 bytes of data from the given @p bytes array in big-endian order.
 constexpr inline uint32_t load32be(const uint8_t* bytes) noexcept
 {
-#ifdef	ommit
-    return (u32{bytes[0]} << 24) | (u32{bytes[1]} << 16) | (u32{bytes[2]} << 8) | u32{bytes[3]};
-#else
 	return __builtin_bswap32(*(uint32_t *)bytes);
-#endif
 }
 
 /// The "equal to" comparison operator for the evmc::address type.
@@ -359,10 +349,6 @@ constexpr inline bytes::operator bool() const noexcept {
 	return this->_size != 0 && this->_data != nullptr;
 }
 
-inline bytes operator""_bytes (const char* s, const size_t sLen) noexcept{
-	return bytes(ewasm_bytes{(void *)s, sLen});
-}
-
 forceinline uint128_t u128From256(const byte *src) {
 	uint128_t ret;
 	memrcpy(&ret, src+16, 16); 
@@ -383,7 +369,7 @@ forceinline void u128To256(const byte *dst, uint128_t val) {
 #ifdef	ommit
 	uint128_t *rp = (uint128_t *)dst;
 	rp[0] = 0;
-	//rp[1] = bswap128(val);
+	rp[1] = bswap128(val);
 #endif
 	memrcpy((void *)(dst+16), (void *)&val, 16);
 }
@@ -423,13 +409,6 @@ forceinline void u32To256(const byte *dst, uint32_t val) {
 }
 
 forceinline void i128To256(const byte *dst, int128_t val) {
-#ifdef	ommit
-	int128_t *rp = (int128_t *)dst;
-	if (val < 0)
-		rp[0] = -1;
-	else rp[0] = 0;
-	//rp[1] = bswap128(val);
-#endif
 	memrcpy((void *)(dst+16), (void *)&val, 16);
 }
 
