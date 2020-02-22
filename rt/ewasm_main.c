@@ -11,7 +11,7 @@ static	byte	ret[32]={0,0,0,0, 0,0,0,10};
 
 #pragma clang diagnostic ignored "-Wmain-return-type"
 // __attribute__((export_name("main")))
-void main()
+__attribute__((noreturn)) void main()
 {
 	u32	in_len;
 	// constructor with null input while no arguments
@@ -61,10 +61,8 @@ void main()
 		eth_revert(0, 0);
 		// invalid, not enough params
 	}
-	//ewasm_print("before call ewasm_main");
 	ewasm_main(mtdPtr->Id, mtdPtr);
-	//ewasm_print("after call ewasm_main");
 	// we should encode result and eth_finish
 	returnResult(mtdPtr->outputs, mtdPtr->nResults);
-	//return 0;
+	__builtin_unreachable();
 }

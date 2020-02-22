@@ -15,6 +15,8 @@ __attribute__((noreturn)) void returnResult(ewasm_argument *args, u32 nRet)
 	//assert(args != nullptr);
 	u32	resLen=0;
 	u32	sliceOff=nRet * 32;
+	// too more return values
+	if (sliceOff > MAX_ABI_INPUT) eth_revert(0, 0);
 	u32	prOff=0;
 	int	i;
 	for (i=0; i<nRet; ++i, prOff+= 32) {
