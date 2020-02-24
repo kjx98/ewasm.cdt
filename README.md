@@ -5,7 +5,7 @@ C/C++ development toolkit for EWASM
 https://travis-ci.org/kjx98/ewasm.cdt)
 
 ## Quick start
-### download and build
+### download and build, requires clang/llvm 8+
 *	git clone https://github.com/kjx98/ewasm.cdt
 *	cd ewasm.cdt
 *	mkdir build
