@@ -45,8 +45,8 @@ void main() // __attribute__((export_name("main")))
 		eth_finish(ret,32);
 		return;
 	}
-	i32 res = __builtin_bswap32(fib(n));
-	*(i32 *)(ret+4) = 0;
-	*(i32 *)(ret+28) = res;
+	i64 res = __builtin_bswap64(fib(n));
+	*(i64 *)(ret+4) = 0;
+	*(i64 *)(ret+24) = res;
 	eth_finish(ret,32);
 }
