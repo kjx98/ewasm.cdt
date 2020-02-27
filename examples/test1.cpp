@@ -62,12 +62,5 @@ void ewasm_main(const u32 Id, const ewasm_method *mtdPtr)
 		eth_finish(ret, 0);
 		return;
 	}
-#ifdef	ommit
-	u32 res = __builtin_bswap32(fib(n));
-	*(u32 *)(ret+4) = 0;
-	*(u32 *)(ret+28) = res;
-	eth_finish(ret,32);
-#else
 	result1[0]._nValue = fib(n);
-#endif
 }
