@@ -119,6 +119,7 @@ struct	bytes32 : ewasm_bytes32
 	{
 		static_assert(sizeof(bytes32) == 32, "size of bytes32 MUST be 32");
 	}
+#ifdef	ommit
 	void from128u(const u128 *u128p) noexcept {
 		memset(bytes, 0, 16);
 		memrcpy(bytes+16, (void *)u128p, 16);
@@ -133,7 +134,6 @@ struct	bytes32 : ewasm_bytes32
 		constexpr uint32_t	off = 32 - sizeof(T);
 		memrcpy(bytes+off, (void *)&v, sizeof(T));
 	}
-#ifdef	ommit
 	void from64u(const uint64_t v) noexcept {
 		memset(bytes, 0, 24);
 		*(uint64_t *)(bytes+24) = __builtin_bswap64(v);
@@ -350,9 +350,14 @@ constexpr inline bytes::operator bool() const noexcept {
 }
 
 forceinline uint128_t u128From256(const byte *src) {
+#ifndef	ommit
+	uint128_t *rp = (uint128_t *)src;
+	return bswap128(rp[1]);
+#else
 	uint128_t ret;
 	memrcpy(&ret, src+16, 16); 
 	return ret;
+#endif
 }
 
 forceinline uint64_t u64From256(const byte *src) {
@@ -366,16 +371,17 @@ forceinline uint32_t u32From256(const byte *src) {
 }
 
 forceinline void u128To256(const byte *dst, uint128_t val) {
-#ifdef	ommit
+#ifndef	ommit
 	uint128_t *rp = (uint128_t *)dst;
 	rp[0] = 0;
 	rp[1] = bswap128(val);
-#endif
+#else
 	memrcpy((void *)(dst+16), (void *)&val, 16);
+#endif
 }
 
 forceinline void u64To256(const byte *dst, uint64_t val) {
-#ifdef	ommit
+#ifndef	ommit
 	uint64_t *rp = (uint64_t *)dst;
 	rp[0] = 0;
 	rp[1] = 0;
@@ -388,7 +394,7 @@ forceinline void u64To256(const byte *dst, uint64_t val) {
 }
 
 forceinline void u32To256(const byte *dst, uint32_t val) {
-#ifdef	ommit
+#ifndef	ommit
 	uint32_t *rp = (uint32_t *)dst;
 #ifdef	DONT_UNROLL
 	for (int i=0; i<7; ++i) rp[i] = 0;
@@ -409,11 +415,17 @@ forceinline void u32To256(const byte *dst, uint32_t val) {
 }
 
 forceinline void i128To256(const byte *dst, int128_t val) {
+#ifndef	ommit
+	int128_t *rp = (int128_t *)dst;
+	if (val < 0) rp[0] = -1; else rp[0] = 0;
+	rp[1] = bswap128(val);
+#else
 	memrcpy((void *)(dst+16), (void *)&val, 16);
+#endif
 }
 
 forceinline void i64To256(const byte *dst, int64_t val) {
-#ifdef	ommit
+#ifndef	ommit
 	int64_t *rp = (int64_t *)dst;
 	if (val < 0) {
 		rp[0] = -1;

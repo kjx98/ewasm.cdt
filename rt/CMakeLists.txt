@@ -29,7 +29,7 @@ set ( builtins_sources
 	multi3.cpp
 	memops.c
 	memcmp.c
-	memrcpy.c
+#	memrcpy.c
 	strlen.c
 	ewasm_main.c
 	abi.cpp

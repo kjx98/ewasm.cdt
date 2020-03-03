@@ -20,6 +20,7 @@ void* memcpy(void* __restrict destination, const void* __restrict source, size_t
 __attribute__ ((noinline))
 void* memset(void* __restrict in, int c, size_t len) {
   uint8_t* in_ptr = (uint8_t*)in;
+  c &= 0xff;
   if (len>8){
     // set in 8-byte chunks
     uint64_t c64 = c + (c<<8) + (c<<16) + (c<<24) + (((uint64_t)c)<<32) + (((uint64_t)c)<<40) + (((uint64_t)c)<<56);
