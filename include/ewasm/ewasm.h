@@ -118,8 +118,8 @@ extern "C" {            /* Assume C declarations for C++ */
 #endif
 // define for memory op, no string.h with clang wasm32 target
 //void *memmove(void *dts, const void *src, size_t);
-//void *memrcpy(void *dst, const void *src, size_t);
 void *memcpy(void *dst, const void *src, size_t);
+void *memrcpy(void *dst, const void *src, size_t);
 void *memset(void *s, int c, size_t);
 int	memcmp(const void *, const void *, size_t);
 size_t strlen(const char *);
