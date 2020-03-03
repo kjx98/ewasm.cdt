@@ -18,10 +18,17 @@
 // Memory Managment Stuff //
 ////////////////////////////
 
-extern unsigned char __heap_base;	// heap_base is immutable position where their model of heap grows down from, can ignore
-extern unsigned char __data_end;	// data_end is immutable position in memory up to where statically allocated things are
+extern unsigned char* __heap_base;	// heap_base is immutable position where their model of heap grows down from, can ignore
+extern unsigned char* __data_end;	// data_end is immutable position in memory up to where statically allocated things are
 extern unsigned long __builtin_wasm_memory_grow(int, unsigned long);	// first arg is mem idx 0, second arg is pages
 extern unsigned long __builtin_wasm_memory_size(int);	// arg must be zero until more memory instances are available
+static uint8_t* heap_ptr;
+
+void malloc_init() {
+	// __heap_base is mutable constant, point to heap base
+	// this heap pointer starts at heap_base and always increments upward
+	heap_ptr = (uint8_t *)__heap_base;
+}
 
 // sample uses:
 //  unsigned char* heap_base = &__heap_base;
@@ -43,9 +50,6 @@ void* malloc(const size_t size){
   //        (export "__data_end" (global 2))		;; allow memory management externally
   // WARNING: There is a bug. The shadow stack has a limit, and can collide with static memory. It may to precompute the maximum shadow stack size needed, and give it to `wasm-ld` with `-z stack-size=10000`.
   // One last thing. `wasm-ld` will take argument `--stack-first` to put the shadow stack before the static memory.
-
-  // this heap pointer starts at heap_base and always increments upward
-  static uint8_t* heap_ptr = &__heap_base;
 
   uint32_t total_bytes_needed = ((uint32_t)heap_ptr)+size;
   // check whether we have enough memory, and handle if we don't
