@@ -1,6 +1,6 @@
+#ifdef	USE_EWASM_CDT
 #include <ewasm/ewasm.h>
-
-/*
+#else
 typedef	int	i32;
 typedef long long i64;
 typedef __int128_t i128;
@@ -12,7 +12,7 @@ typedef __uint128_t u128;
 void eth_finish(void* _off, i32 _len) __attribute__((__import_module__("ethereum"), __import_name__("finish")));
 i32  eth_getCallDataSize() __attribute__((import_module("ethereum"),import_name("getCallDataSize")));
 void eth_callDataCopy(void *res, i32 dOff, i32 dLen) __attribute__((import_module("ethereum"),import_name("callDataCopy")));
-*/
+#endif
 
 static u64 fib(u32 n) {
 	if (n < 2) return n;
