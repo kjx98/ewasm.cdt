@@ -18,7 +18,7 @@ static ewasm_argument	result1[]={{UINT64}};
 static ewasm_argument	retAddr[]={{UINT160}};
 static ewasm::method	_methods[]={
 	{"constructor", 0},
-	{"fib", 0x73181a7b, arg1, result1},
+	{"FibValue", 0x73181a7b, arg1, result1},
 	{"owner", 0x8da5cb5b, 0, retAddr},
 };
 
@@ -41,6 +41,9 @@ void ewasm_main(const u32 Id, const ewasm_method *mtdPtr)
 	static_assert(sizeof(method) == sizeof(ewasm_method), "size of ewasm_method and method MUST equal");
 	static_assert(sizeof(ABI) == sizeof(ewasm_ABI), "size of ewasm_ABI and ABI MUST equal");
 	u32 n = 10;
+	// following print method Id and Name
+	//debug_print32(Id);
+	//debug_print(mtdPtr->Name, strlen(mtdPtr->Name));
 	switch (Id) {
 	case 0x73181a7b:
 		n = arg1[0]._nValue;

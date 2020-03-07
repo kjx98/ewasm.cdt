@@ -169,10 +169,14 @@ void DEBUG_IMPORT(printStorageHex, (void *));
 
 #ifndef	NDEBUG
 void DEBUG_IMPORT(print, (void*, u32));
+void DEBUG_IMPORT(print32, (u32));
+void DEBUG_IMPORT(print64, (u64));
 void DEBUG_IMPORT(printMem, (void*, u32));
 void DEBUG_IMPORT(printMemHex, (void*, u32));
 #else
 #define	debug_print(x, y)	(void *)0
+#define	debug_print32(x)	(void *)0
+#define	debug_print64(x)	(void *)0
 #define	debug_printMem(x, y)	(void *)0
 #define	debug_printMemHex(x, y)	(void *)0
 #define	debug_printStorage(x)	(void *)0
