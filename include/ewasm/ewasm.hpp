@@ -396,9 +396,6 @@ forceinline void u64To256(const byte *dst, uint64_t val) {
 forceinline void u32To256(const byte *dst, uint32_t val) {
 #ifndef	ommit
 	uint32_t *rp = (uint32_t *)dst;
-#ifdef	DONT_UNROLL
-	for (int i=0; i<7; ++i) rp[i] = 0;
-#else
 	rp[0] = 0;
 	rp[1] = 0;
 	rp[2] = 0;
@@ -406,8 +403,7 @@ forceinline void u32To256(const byte *dst, uint32_t val) {
 	rp[4] = 0;
 	rp[5] = 0;
 	rp[6] = 0;
-#endif
-	rp[7] = __builtin_bswap64(val);
+	rp[7] = __builtin_bswap32(val);
 #else
 	bytes32	*rp=static_cast<bytes32 *>((void *)dst);
 	rp->fromUint(val);
