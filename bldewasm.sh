@@ -6,7 +6,7 @@
 #
 
 SUF=""
-which wasm-ld-9 && SUF="-9"
+which wasm-ld-9 >& /dev/null && SUF="-9"
 EXPO="--export=main"
 #EXPO="--export=main --export=__heap_base"
 if [ -d ../include/ewasm ]; then
