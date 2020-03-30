@@ -1,7 +1,8 @@
-#include "abi.h"
-#include "ewasm_main.h"
 #include <assert.h>
 #include <ewasm/ewasm.hpp>
+
+#include "abi.h"
+#include "ewasm_main.h"
 
 //#include <type_traits>
 

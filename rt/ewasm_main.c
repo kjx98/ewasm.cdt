@@ -1,6 +1,7 @@
-#include "ewasm_main.h"
-#include "abi.h"
 #include <ewasm/ewasm.h>
+
+#include "abi.h"
+#include "ewasm_main.h"
 
 #ifdef USE_MALLOC_ABI
 byte *__abiBuff; //[MAX_ABI_INPUT];
