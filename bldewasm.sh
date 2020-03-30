@@ -26,6 +26,12 @@ else
 	OPTS+=" -DNDEBUG"
 	EXPO+=" --strip-all"
 fi
+if [ "${RAW}" = "" ]; then
+	LIBS="-L${LIBPATH} -lrt"
+else
+	LIBS=
+	EXPO=" --export-all"
+fi
 
 compile() {
 SFIL=$1
@@ -65,8 +71,6 @@ fi
 #echo "ewasm lib dir is ${LIBPATH}"
 echo "wasm-ld export is ${EXPO}"
 #wasm-ld --no-entry --allow-undefined-file=${HOME}/opt/ewasm/ewasm.syms --export=main --strip-all ${OBJS} -L${LIBPATH} -lrt -o ${FILE}.wasm
-wasm-ld${SUF} --no-entry --allow-undefined-file=${HOME}/opt/ewasm/ewasm.syms ${EXPO} ${OBJS} -L${LIBPATH} -lrt -o ${FILE}.wasm
+wasm-ld${SUF} --no-entry --allow-undefined-file=${HOME}/opt/ewasm/ewasm.syms ${EXPO} ${OBJS} ${LIBS} -o ${FILE}.wasm
 #clang${SUF} --target=wasm32 --no-standard-libraries -Wl,--no-entry -Wl,--allow-undefined-file=${HOME}/opt/ewasm/ewasm.syms -Wl,${EXPO} -Wl,--strip-all -L${LIBPATH} -lrt -o ${FILE}.wasm ${OBJS}
 rm -f ${OBJS}
-#wasm-dis /tmp/${FILE}.wasm | sed -s 's/Main/main/' > /tmp/${FILE}.wat
-#wasm-as /tmp/${FILE}.wat -o ${FILE}.wasm

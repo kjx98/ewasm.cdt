@@ -21,42 +21,41 @@
 #ifndef __EWASM_H__
 #define __EWASM_H__
 
-#if	__clang_major__ > 8
+#if __clang_major__ > 8
 #include <stddef.h>
 #include <stdint.h>
 #else
-typedef	unsigned char	uint8_t;
-typedef	unsigned short	uint16_t;
-typedef	unsigned int	uint32_t;
-typedef	unsigned long long	uint64_t;
-typedef	unsigned long	size_t;
-typedef	short	int16_t;
-typedef	int	int32_t;
-typedef	long long	int64_t;
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+typedef unsigned long long uint64_t;
+typedef unsigned long size_t;
+typedef short int16_t;
+typedef int int32_t;
+typedef long long int64_t;
 #endif
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 using uint128_t = unsigned __int128;
-using int128_t	= __int128;
+using int128_t = __int128;
 using byte = uint8_t;
 #else
 typedef unsigned __int128 uint128_t;
-typedef __int128	int128_t;
-typedef uint8_t		byte;
+typedef __int128 int128_t;
+typedef uint8_t byte;
 #endif
 
-#ifdef	__GNUC__
+#ifdef __GNUC__
 #define forceinline __inline__ __attribute__((always_inline))
 #else
 #define forceinline __inline__
 #endif
 
-
 //////////////////////////
 // Types For Wasm Stuff //
 //////////////////////////
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 using i32 = int32_t;
 using i64 = int64_t;
 using u32 = uint32_t;
@@ -68,60 +67,60 @@ typedef int32_t i32; // same as i32 in WebAssembly
 typedef int64_t i64; // same as i64 in WebAssembly
 typedef uint32_t u32;
 typedef uint64_t u64;
-typedef unsigned __int128 u128; // a 128 bit number, represented as a 16 bytes long little endian unsigned integer in memory, not sure if this works
-//typedef uint256_t u256; // a 256 bit number, represented as a 32 bytes long little endian unsigned integer in memory, doesn't work
-typedef uint32_t i32ptr; // same as i32 in WebAssembly, but treated as a pointer to a WebAssembly memory offset
+typedef unsigned __int128
+    u128; // a 128 bit number, represented as a 16 bytes long little endian
+          // unsigned integer in memory, not sure if this works
+// typedef uint256_t u256; // a 256 bit number, represented as a 32 bytes long
+// little endian unsigned integer in memory, doesn't work
+typedef uint32_t i32ptr; // same as i32 in WebAssembly, but treated as a pointer
+                         // to a WebAssembly memory offset
 #endif
 
 // bswap32, bswap64 already builtin
 forceinline uint128_t bswap128(uint128_t ml) {
-	uint128_t ret;
-	u64	*ss=(u64 *)&ml;
-	u64	*dp=(u64 *)&ret;
-	dp[0] = __builtin_bswap64(ss[1]);
-	dp[1] = __builtin_bswap64(ss[0]);
-	return ret;
+  uint128_t ret;
+  u64 *ss = (u64 *)&ml;
+  u64 *dp = (u64 *)&ret;
+  dp[0] = __builtin_bswap64(ss[1]);
+  dp[1] = __builtin_bswap64(ss[0]);
+  return ret;
 }
-
 
 //////////////////////////////
 // Types for Ethereum Stuff //
 //////////////////////////////
 
 // an array of 32 bytes
-typedef struct	ewasm_bytes32
-{
-	uint8_t	bytes[32];
+typedef struct ewasm_bytes32 {
+  uint8_t bytes[32];
 } ewasm_bytes32;
 
-typedef struct ewasm_address
-{
-	uint8_t bytes[20]; // an array of 20 bytes
+typedef struct ewasm_address {
+  uint8_t bytes[20]; // an array of 20 bytes
 } ewasm_address;
 
-typedef struct ewasm_bytes
-{
-	void	*_data;
-	u32		_size;
+typedef struct ewasm_bytes {
+  void *_data;
+  u32 _size;
 } ewasm_bytes;
 
 // builtin and host interface function as C declarations
-#ifdef	__cplusplus
-namespace	ewasm {
-struct	address;
-struct	bytes32;
-};
+#ifdef __cplusplus
+namespace ewasm {
+struct address;
+struct bytes32;
+}; // namespace ewasm
 
-using	namespace ewasm;
+using namespace ewasm;
 
-extern "C" {            /* Assume C declarations for C++ */
+extern "C" { /* Assume C declarations for C++ */
 #endif
 // define for memory op, no string.h with clang wasm32 target
-//void *memmove(void *dts, const void *src, size_t);
+// void *memmove(void *dts, const void *src, size_t);
 void *memcpy(void *dst, const void *src, size_t);
 void *memrcpy(void *dst, const void *src, size_t);
 void *memset(void *s, int c, size_t);
-int	memcmp(const void *, const void *, size_t);
+int memcmp(const void *, const void *, size_t);
 size_t strlen(const char *);
 
 void *malloc(size_t);
@@ -129,157 +128,152 @@ void *calloc(size_t count, size_t size);
 void free(void *);
 void *realloc(void *, size_t);
 
-
 ////////////////////////////
 // EEI Method Declaration //
 ////////////////////////////
 // ethereum interface functions
-#define DECL_IMPORT(name, args) eth_##name args \
-    __attribute__((import_module("ethereum"),import_name( #name )))
-#define DEBUG_IMPORT(name, args) debug_##name args \
-    __attribute__((import_module("debug"),import_name( #name )))
+#define DECL_IMPORT(name, args)                                                \
+  eth_##name args __attribute__((import_module("ethereum"), import_name(#name)))
+#define DEBUG_IMPORT(name, args)                                               \
+  debug_##name args __attribute__((import_module("debug"), import_name(#name)))
 
-#ifdef	__cplusplus
-void DECL_IMPORT(getAddress, (address* res));
-void DECL_IMPORT(getExternalBalance, (address* acct, u128 *bal));
-void DECL_IMPORT(storageStore, (bytes32* key, bytes32* value));
-void DECL_IMPORT(storageLoad, (bytes32* key, bytes32* value));
-void DECL_IMPORT(getCaller, (address* acct));
-void DECL_IMPORT(getTxOrigin, (address* acct));
-void DECL_IMPORT(log, (void* dat, u32 dLen, u32 numTopics, bytes32* to1, bytes32* to2, bytes32* to3, bytes32* to4));
-void DECL_IMPORT(selfDestruct, (address* selfAddr));
-#ifndef	NDEBUG
+#ifdef __cplusplus
+void DECL_IMPORT(getAddress, (address * res));
+void DECL_IMPORT(getExternalBalance, (address * acct, u128 *bal));
+void DECL_IMPORT(storageStore, (bytes32 * key, bytes32 *value));
+void DECL_IMPORT(storageLoad, (bytes32 * key, bytes32 *value));
+void DECL_IMPORT(getCaller, (address * acct));
+void DECL_IMPORT(getTxOrigin, (address * acct));
+void DECL_IMPORT(log, (void *dat, u32 dLen, u32 numTopics, bytes32 *to1,
+                       bytes32 *to2, bytes32 *to3, bytes32 *to4));
+void DECL_IMPORT(selfDestruct, (address * selfAddr));
+#ifndef NDEBUG
 void DEBUG_IMPORT(printStorage, (bytes32 *));
 void DEBUG_IMPORT(printStorageHex, (bytes32 *));
 #endif
 #else
-void DECL_IMPORT(getAddress, (void* res));
-void DECL_IMPORT(getExternalBalance, (void* acct, u128 *bal));
-void DECL_IMPORT(storageStore, (void* key, void* value));
-void DECL_IMPORT(storageLoad, (void* key, void* value));
-void DECL_IMPORT(getCaller, (void* acct));
-void DECL_IMPORT(getTxOrigin, (void* acct));
-void DECL_IMPORT(log, (void* dat, u32 dLen, u32 numTopics, void* to1, void* to2, void* to3, void* to4));
-void DECL_IMPORT(selfDestruct, (void* selfAddr));
-#ifndef	NDEBUG
+void DECL_IMPORT(getAddress, (void *res));
+void DECL_IMPORT(getExternalBalance, (void *acct, u128 *bal));
+void DECL_IMPORT(storageStore, (void *key, void *value));
+void DECL_IMPORT(storageLoad, (void *key, void *value));
+void DECL_IMPORT(getCaller, (void *acct));
+void DECL_IMPORT(getTxOrigin, (void *acct));
+void DECL_IMPORT(log, (void *dat, u32 dLen, u32 numTopics, void *to1, void *to2,
+                       void *to3, void *to4));
+void DECL_IMPORT(selfDestruct, (void *selfAddr));
+#ifndef NDEBUG
 void DEBUG_IMPORT(printStorage, (void *));
 void DEBUG_IMPORT(printStorageHex, (void *));
 #endif
 #endif
 
-#ifndef	NDEBUG
-void DEBUG_IMPORT(print, (void*, u32));
+#ifndef NDEBUG
+void DEBUG_IMPORT(print, (void *, u32));
 void DEBUG_IMPORT(print32, (u32));
 void DEBUG_IMPORT(print64, (u64));
-void DEBUG_IMPORT(printMem, (void*, u32));
-void DEBUG_IMPORT(printMemHex, (void*, u32));
+void DEBUG_IMPORT(printMem, (void *, u32));
+void DEBUG_IMPORT(printMemHex, (void *, u32));
 #else
-#define	debug_print(x, y)	(void *)0
-#define	debug_print32(x)	(void *)0
-#define	debug_print64(x)	(void *)0
-#define	debug_printMem(x, y)	(void *)0
-#define	debug_printMemHex(x, y)	(void *)0
-#define	debug_printStorage(x)	(void *)0
-#define	debug_printStorageHex(x)	(void *)0
+#define debug_print(x, y) (void *)0
+#define debug_print32(x) (void *)0
+#define debug_print64(x) (void *)0
+#define debug_printMem(x, y) (void *)0
+#define debug_printMemHex(x, y) (void *)0
+#define debug_printStorage(x) (void *)0
+#define debug_printStorageHex(x) (void *)0
 #endif
 
 void DECL_IMPORT(useGas, (i64 gas));
-void DECL_IMPORT(getCallValue, (u128 *val));
-u32	DECL_IMPORT(getCallDataSize, () );
+void DECL_IMPORT(getCallValue, (u128 * val));
+u32 DECL_IMPORT(getCallDataSize, ());
 void DECL_IMPORT(callDataCopy, (void *res, u32 dOff, u32 dLen));
 
 void DECL_IMPORT(codeCopy, (void *res, u32 codeOff, u32 codeLen));
-u32 DECL_IMPORT(getCodeSize, () );
+u32 DECL_IMPORT(getCodeSize, ());
 
-u64 DECL_IMPORT(getGasLeft, () );
-u64 DECL_IMPORT(getBlockGasLimit, () );
-void DECL_IMPORT(getTxGasPrice, (u128 *prc));
-u64 DECL_IMPORT(getBlockNumber, () );
-u64 DECL_IMPORT(getBlockTimestamp, () );
+u64 DECL_IMPORT(getGasLeft, ());
+u64 DECL_IMPORT(getBlockGasLimit, ());
+void DECL_IMPORT(getTxGasPrice, (u128 * prc));
+u64 DECL_IMPORT(getBlockNumber, ());
+u64 DECL_IMPORT(getBlockTimestamp, ());
 
-void DECL_IMPORT(finish, (void* _off, u32 _len));
-void DECL_IMPORT(revert, (void* _off, u32 _len));
-
+void DECL_IMPORT(finish, (void *_off, u32 _len));
+void DECL_IMPORT(revert, (void *_off, u32 _len));
 
 ///////////////////////////////////////////////////
 // Useful Intrinsics, Not Including Memory Stuff //
 ///////////////////////////////////////////////////
 
-void __builtin_unreachable();			// wasm unreachable opcode
-int __builtin_ctz(unsigned int); 		// wasm i32.ctz opcode
-int __builtin_ctzll(unsigned long long); 	// wasm i64.ctz opcode
+void __builtin_unreachable();            // wasm unreachable opcode
+int __builtin_ctz(unsigned int);         // wasm i32.ctz opcode
+int __builtin_ctzll(unsigned long long); // wasm i64.ctz opcode
 // there are many more like this
 
-void forceinline exit(int i){ __builtin_unreachable(); }
+void forceinline exit(int i) { __builtin_unreachable(); }
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 }
 #endif
 
-
 ///////////////////////////////////////////////////
-// ethereum ABI									 //
+// ethereum ABI //
 ///////////////////////////////////////////////////
 // ethereum ABI not only for C++
-#ifdef	NDEBUG
-#define	ewasm_print(x)	(void *)0
+#ifdef NDEBUG
+#define ewasm_print(x) (void *)0
 #else
-#ifdef	__cplusplus
-template <size_t N>
-forceinline void ewasm_print(const char (&s)[N]) {
-	debug_print((void *)s, N);
+#ifdef __cplusplus
+template <size_t N> forceinline void ewasm_print(const char (&s)[N]) {
+  debug_print((void *)s, N);
 }
 #else
-#define	ewasm_print(x)	debug_print(x, strlen(x))
+#define ewasm_print(x) debug_print(x, strlen(x))
 #endif
 #endif
 
-enum	ewasm_argType {
-	UINT16	= 0,
-	UINT32	= 1,
-	UINT64	= 2,
-	BOOL	= 3,
-	INT16	= 4,
-	INT32	= 5,
-	INT64	= 6,
-	UINT128	= 7,
-	UINT256	= 8,
-	INT128	= 9,
-	INT256	= 10,
-	UINT160	= 11,
-	STRING	= 12,
-	BYTES	= 13,
+enum ewasm_argType {
+  UINT16 = 0,
+  UINT32 = 1,
+  UINT64 = 2,
+  BOOL = 3,
+  INT16 = 4,
+  INT32 = 5,
+  INT64 = 6,
+  UINT128 = 7,
+  UINT256 = 8,
+  INT128 = 9,
+  INT256 = 10,
+  UINT160 = 11,
+  STRING = 12,
+  BYTES = 13,
 };
 
-typedef	struct ewasm_argument
-{
-	i32		_type;
-	ewasm_bytes	pValue;	// for int/uint 128, 256 and bytes
-	u64		_nValue;
-}	ewasm_argument;
+typedef struct ewasm_argument {
+  i32 _type;
+  ewasm_bytes pValue; // for int/uint 128, 256 and bytes
+  u64 _nValue;
+} ewasm_argument;
 
-typedef	struct ewasm_method
-{
-	char	*Name;	// name of method
-	u32		Id;		// uint32be ID of method, 0 for Constructor
-	u32		nParams;
-	u32		nResults;
-	ewasm_argument	*inputs;
-	ewasm_argument	*outputs;
-}	ewasm_method;
+typedef struct ewasm_method {
+  char *Name; // name of method
+  u32 Id;     // uint32be ID of method, 0 for Constructor
+  u32 nParams;
+  u32 nResults;
+  ewasm_argument *inputs;
+  ewasm_argument *outputs;
+} ewasm_method;
 
-typedef	struct ewasm_ABI
-{
-	u32					nMethods;	// >0, at least constructor
-	const ewasm_method	*methods;	// the first method MUST BE constructor
-}	ewasm_ABI;
+typedef struct ewasm_ABI {
+  u32 nMethods;                // >0, at least constructor
+  const ewasm_method *methods; // the first method MUST BE constructor
+} ewasm_ABI;
 
-#ifdef	__cplusplus
-extern "C" {            /* Assume C declarations for C++ */
+#ifdef __cplusplus
+extern "C" { /* Assume C declarations for C++ */
 #endif
-extern	ewasm_ABI	__Contract_ABI;
+extern ewasm_ABI __Contract_ABI;
 void ewasm_main(const u32 Id, const ewasm_method *);
-#ifdef	__cplusplus
+#ifdef __cplusplus
 }
 #endif
 
@@ -294,20 +288,22 @@ __attribute__((import_module("ethereum")))	- work with clang/llvm 8+
 __attribute__((import_name("funcname")))	- work with clang/llvm 8+
 __attribute__((visibility("default"))) 		- make function exported
 __attribute__((visibility("hidden")))		- make thing not exported
-__attribute__((visibility("used")))		- make variable const global and exported
-__attribute__((noinline))			- don't inline this function, since llvm tries to inline it since code size is less important for LLVM
+__attribute__((visibility("used")))		- make variable const global and
+exported
+__attribute__((noinline))			- don't inline this function,
+since llvm tries to inline it since code size is less important for LLVM
 __attribute__((always_inline))
 __attribute__((noreturn))
 
-e.g. create a global variable (but it will be immutable, don't know how to create a mutable one):
+e.g. create a global variable (but it will be immutable, don't know how to
+create a mutable one):
    __attribute__((used))
    static int heap_ptr=0;
 
 */
 
-
 //
 // for testing, can export start fuction
-//void _start(){  _main(); }
+// void _start(){  _main(); }
 
 #endif
